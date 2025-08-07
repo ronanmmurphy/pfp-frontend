@@ -1,0 +1,63 @@
+<div class="modal-header">
+  <h5 class="modal-title">New Session</h5>
+  <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+
+<div class="modal-body">
+  <!-- Veteran Location -->
+  <p>
+    <strong>Your Location:</strong>
+    <br />
+    {{ user.address1 }}, {{ user.city }}, {{ user.state }}, {{ user.country }}, {{ user.postal_code }}
+  </p>
+
+  <!-- Location Filter -->
+  <div class="mb-3">
+    <label class="form-label"><strong>Search for photographers within:</strong></label>
+    <select class="form-select" [(ngModel)]="selectedRadius" (change)="onRadiusChange()">
+      <option *ngFor="let option of locationOptions" [value]="option">{{ option }}</option>
+    </select>
+    <input
+      *ngIf="selectedRadius === 'Custom'"
+      class="form-control mt-3"
+      placeholder="Enter zip code or location"
+      [(ngModel)]="customLocation"
+    />
+  </div>
+
+  <!-- Map Placeholder -->
+  <div class="map-container mb-3">
+    <div id="leafletMap" class="rounded border" style="height: 300px"></div>
+  </div>
+
+  <!-- Photographer Table -->
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>SELECT</th>
+          <th>NAME</th>
+          <th>LOCATION</th>
+          <th>EMAIL</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (photographer of filteredPhotographers; track photographer) {
+          <tr [class.table-active]="selectedPhotographer?.id === photographer.id">
+            <td>
+              <input type="radio" name="selectPhotographer" [value]="photographer.id" (change)="selectPhotographer(photographer)" />
+            </td>
+            <td>{{ photographer.name }}</td>
+            <td>{{ photographer.location }}</td>
+            <td>{{ photographer.email }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="close()">Cancel</button>
+  <button class="btn btn-primary" [disabled]="!selectedPhotographer" (click)="requestSession()">Request</button>
+</div>
