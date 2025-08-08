@@ -17,12 +17,10 @@
     <select class="form-select" [(ngModel)]="selectedRadius" (change)="onRadiusChange()">
       <option *ngFor="let option of locationOptions" [value]="option">{{ option }}</option>
     </select>
-    <input
-      *ngIf="selectedRadius === 'Custom'"
-      class="form-control mt-3"
-      placeholder="Enter zip code or location"
-      [(ngModel)]="customLocation"
-    />
+    <div *ngIf="selectedRadius === 'Custom Radius...'" class="d-flex align-items-center gap-2 mt-3">
+      <input class="form-control" placeholder="Enter zip code or location" [(ngModel)]="customLocation" />
+      <button class="btn btn-primary">Search</button>
+    </div>
   </div>
 
   <!-- Map Placeholder -->

@@ -1,0 +1,115 @@
+<div class="row">
+  <div class="col-md-12 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Active Sessions</h5>
+      <button *ngIf="role === 2" class="btn btn-primary btn-sm" (click)="openNewSessionModal()">New Session</button>
+    </div>
+
+    <div class="card tbl-card">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>{{ role === 1 ? 'VETERAN' : 'PHOTOGRAPHER' }}</th>
+              <th>DATE</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (session of activeSessions; track session) {
+              <tr>
+                <td>{{ session.id }}</td>
+                <td>{{ role === 1 ? session.veteran : session.photographer }}</td>
+                <td>{{ session.date }}</td>
+                <td>
+                  <span class="d-block">
+                    <i
+                      class="badge-circle f-10 me-1"
+                      [ngClass]="{
+                        'bg-success': session.status === 'Scheduled' || session.status === 'Rescheduled',
+                        'bg-warning': session.status === 'Requested'
+                      }"
+                    ></i>
+                    {{ session.status }}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    *ngIf="role === 1 && session.status === 'Requested'"
+                    class="btn btn-link text-success"
+                    (click)="approve(session)"
+                    title="Approve"
+                  >
+                    <i antIcon type="check-circle" theme="outline"></i>
+                  </button>
+                  <button
+                    *ngIf="role === 1 && (session.status === 'Scheduled' || session.status === 'Rescheduled')"
+                    class="btn btn-link text-success"
+                    (click)="complete(session)"
+                    title="Complete"
+                  >
+                    <i antIcon type="clear" theme="outline"></i>
+                  </button>
+                  <button class="btn btn-link text-danger" (click)="cancel(session)" title="Cancel">
+                    <i antIcon type="close-circle" theme="outline"></i>
+                  </button>
+                  <button class="btn btn-link text-warning" (click)="reschedule(session)" title="Reschedule">
+                    <i antIcon type="schedule" theme="outline"></i>
+                  </button>
+                  <button class="btn btn-link text-primary" (click)="view(session)" title="View">
+                    <i antIcon type="eye" theme="outline"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h5 class="mt-5 mb-3">All Sessions</h5>
+    <div class="card tbl-card">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>{{ role === 1 ? 'VETERAN' : 'PHOTOGRAPHER' }}</th>
+              <th>DATE</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (session of completedSessions; track session) {
+              <tr>
+                <td>{{ session.id }}</td>
+                <td>{{ role === 1 ? session.veteran : session.photographer }}</td>
+                <td>{{ session.date }}</td>
+                <td>
+                  <span class="d-block">
+                    <i
+                      class="badge-circle f-10 me-1"
+                      [ngClass]="{
+                        'bg-info': session.status === 'Completed',
+                        'bg-danger': session.status === 'Canceled'
+                      }"
+                    ></i>
+                    {{ session.status }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-link text-primary" (click)="view(session)" title="View">
+                    <i antIcon type="eye" theme="outline"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

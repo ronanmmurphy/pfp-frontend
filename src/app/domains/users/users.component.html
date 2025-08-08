@@ -1,0 +1,39 @@
+<div class="row">
+  <div class="col-md-12 mt-4">
+    <h5 class="mb-3">All Users</h5>
+    <div class="card tbl-card">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Location</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td>{{ user.id }}</td>
+              <td>{{ user.firstName }} {{ user.lastName }}</td>
+              <td class="text-capitalize">{{ user.role }}</td>
+              <td>{{ user.location }}</td>
+              <td>
+                <button class="btn btn-link text-primary" (click)="view(user)" title="View">
+                  <i antIcon type="eye" theme="outline"></i>
+                </button>
+                <button class="btn btn-link text-success" (click)="edit(user)" title="Edit">
+                  <i antIcon type="edit" theme="outline"></i>
+                </button>
+                <button class="btn btn-link text-danger" (click)="delete(user)" title="Delete">
+                  <i antIcon type="delete" theme="outline"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

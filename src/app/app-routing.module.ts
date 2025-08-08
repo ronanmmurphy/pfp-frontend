@@ -23,6 +23,11 @@ const routes: Routes = [
         canActivate: [AuthGuard]
       },
       {
+        path: 'users',
+        loadComponent: () => import('./domains/users/users.component').then((c) => c.UsersComponent),
+        canActivate: [AuthGuard]
+      },
+      {
         path: 'sessions',
         loadComponent: () => import('./domains/sessions/sessions.component').then((c) => c.SessionsComponent),
         canActivate: [AuthGuard]

@@ -1,0 +1,50 @@
+<div class="container">
+  <div class="col-md-12 col-xl-12 mt-4">
+    <h5 class="mb-3">All Sessions</h5>
+    <div class="card tbl-card">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>NO.</th>
+              <th>PHOTOGRAPHER</th>
+              <th>VETERAN</th>
+              <th>DATE</th>
+              <th>STATUS</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (session of sessions; track session) {
+              <tr>
+                <td>
+                  <a href="javascript:" class="text-muted">{{ session.id }}</a>
+                </td>
+                <td>{{ session.photographer }}</td>
+                <td>{{ session.veteran }}</td>
+                <td>{{ session.date }}</td>
+                <td>
+                  <span class="d-block">
+                    <i class="badge-circle {{ session.status_type }} f-10 m-r-5"></i>
+                    {{ session.status }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-link text-primary" (click)="view(session)" title="View">
+                    <i antIcon type="eye" theme="outline"></i>
+                  </button>
+                  <button class="btn btn-link text-success" (click)="edit(session)" title="Edit">
+                    <i antIcon type="edit" theme="outline"></i>
+                  </button>
+                  <button class="btn btn-link text-danger" (click)="delete(session)" title="Delete">
+                    <i antIcon type="delete" theme="outline"></i>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

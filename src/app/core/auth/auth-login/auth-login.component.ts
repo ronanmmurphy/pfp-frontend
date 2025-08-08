@@ -12,22 +12,6 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './auth-login.component.scss'
 })
 export class AuthLoginComponent {
-  // public method
-  SignInOptions = [
-    {
-      image: 'assets/images/authentication/google.svg',
-      name: 'Google'
-    },
-    {
-      image: 'assets/images/authentication/twitter.svg',
-      name: 'Twitter'
-    },
-    {
-      image: 'assets/images/authentication/facebook.svg',
-      name: 'Facebook'
-    }
-  ];
-
   email: string = '';
   password: string = '';
 
@@ -52,6 +36,19 @@ export class AuthLoginComponent {
       email: 'james.cook@gmail.com',
       password: 'password234!',
       role: 2,
+      address1: 'Harrison Ave',
+      address2: '',
+      city: 'Dallas',
+      state: 'Texas',
+      country: 'United States',
+      postal_code: '75215'
+    },
+    {
+      id: 3,
+      name: 'Ronan Murphy',
+      email: 'ronan.murphy@gmail.com',
+      password: 'password345!',
+      role: 0,
       address1: 'Harrison Ave',
       address2: '',
       city: 'Dallas',

@@ -47,6 +47,9 @@ export class NavContentComponent implements OnInit {
   navigation = NavigationItems;
   windowWidth = window.innerWidth;
 
+  // Business Logic
+  userRole = 1;
+
   // Constructor
   constructor() {
     this.iconService.addIcon(
@@ -70,6 +73,10 @@ export class NavContentComponent implements OnInit {
     if (this.windowWidth < 1025) {
       (document.querySelector('.coded-navbar') as HTMLDivElement).classList.add('menupos-static');
     }
+    const userData = JSON.parse(localStorage.getItem('user'));
+    this.userRole = userData?.role ?? 1;
+    console.log('userData', userData);
+    console.log('userRole', this.userRole);
   }
 
   fireOutClick() {

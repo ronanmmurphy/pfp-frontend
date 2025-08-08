@@ -1,0 +1,58 @@
+<div class="row">
+  @for (analytic of AnalyticEcommerce; track analytic) {
+    <div class="col-md-6 col-xl-3">
+      <app-card [showHeader]="false" blockClass="dashboard-card">
+        <h6 class="mb-2 f-w-400 text-muted">{{ analytic.title }}</h6>
+        <h4 class="mb-3">
+          {{ analytic.amount }}
+          <span class="badge {{ analytic.background }} border {{ analytic.border }} ">
+            <i antIcon type="{{ analytic.icon }}" theme="outline"></i>
+            {{ analytic.percentage }}
+          </span>
+        </h4>
+        <p class="mb-0 text-muted text-sm">
+          You made an extra
+          <span class="{{ analytic.color }}">{{ analytic.number }}</span>
+          this year
+        </p>
+      </app-card>
+    </div>
+  }
+
+  <div class="col-md-12 col-xl-12 mt-4">
+    <h5 class="mb-3">Recent Sessions</h5>
+    <div class="card tbl-card">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>NO.</th>
+              <th>PHOTOGRAPHER</th>
+              <th>VETERAN</th>
+              <th>DATE</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (session of recentSessions; track session) {
+              <tr>
+                <td>
+                  <a href="javascript:" class="text-muted">{{ session.id }}</a>
+                </td>
+                <td>{{ session.photographer }}</td>
+                <td>{{ session.veteran }}</td>
+                <td>{{ session.date }}</td>
+                <td>
+                  <span class="d-block">
+                    <i class="badge-circle {{ session.status_type }} f-10 m-r-5"></i>
+                    {{ session.status }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

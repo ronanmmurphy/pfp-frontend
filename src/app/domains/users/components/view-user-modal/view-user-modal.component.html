@@ -1,0 +1,165 @@
+<!-- user-modal.component.html -->
+<div class="modal-header">
+  <h5 class="modal-title">{{ isEditMode ? 'Edit User' : 'View User' }}</h5>
+  <button type="button" class="btn-close" (click)="close()"></button>
+</div>
+<div class="modal-body">
+  <form>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">First Name</label>
+        <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.firstName" name="firstName" />
+      </div>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Last Name</label>
+        <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.lastName" name="lastName" />
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.email" name="email" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Role</label>
+      <select class="form-select" [(ngModel)]="user.role" name="role" [disabled]="!isEditMode">
+        <option value="admin">Admin</option>
+        <option value="photographer">Photographer</option>
+        <option value="veteran">Veteran</option>
+      </select>
+    </div>
+
+    <!-- Photographer -->
+    <ng-container *ngIf="user.role !== 'admin'">
+      <div class="mb-3">
+        <label class="form-label">Phone Number</label>
+        <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.phoneNumber" name="phoneNumber" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Street Address</label>
+        <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.streetAddress" name="streetAddress" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Street Address Line 2</label>
+        <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.streetAddress2" name="streetAddress2" />
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">City</label>
+          <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.city" name="city" />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">State</label>
+          <select class="form-select" [(ngModel)]="user.state" name="state" [disabled]="!isEditMode">
+            <option *ngFor="let state of usStates" [value]="state">{{ state }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Postal Code</label>
+        <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.postalCode" name="postalCode" />
+      </div>
+      @if (user.role === 'photographer') {
+        <div class="mb-3">
+          <label class="form-label">Link To Professional Portfolio</label>
+          <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.website" name="website" />
+        </div>
+      }
+      @if (user.role === 'veteran') {
+        <div class="mb-3">
+          <label class="form-label">Are You Currently Seeking Employment?</label>
+          <br />
+          <label class="me-3">
+            <input type="radio" name="seeking" value="yes" [(ngModel)]="user.seekingEmployment" [disabled]="!isEditMode" />
+            Yes
+          </label>
+          <label>
+            <input type="radio" name="seeking" value="no" [(ngModel)]="user.seekingEmployment" [disabled]="!isEditMode" />
+            No
+          </label>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">LinkedIn Profile</label>
+          <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.linkedIn" name="linkedIn" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Eligibility</label>
+          <br />
+          <label class="d-block">
+            <input
+              type="radio"
+              name="eligibility"
+              value="Transitioning Service Member"
+              [(ngModel)]="user.eligibility"
+              [disabled]="!isEditMode"
+            />
+            Transitioning Service Member
+          </label>
+          <label class="d-block">
+            <input
+              type="radio"
+              name="eligibility"
+              value="Gold Star Family Member"
+              [(ngModel)]="user.eligibility"
+              [disabled]="!isEditMode"
+            />
+            Gold Star Family Member
+          </label>
+          <label class="d-block">
+            <input type="radio" name="eligibility" value="Military Spouse" [(ngModel)]="user.eligibility" [disabled]="!isEditMode" />
+            Military Spouse
+          </label>
+        </div>
+        <div class="form-group mb-3">
+          <label class="form-label" for="branch">
+            Military Branch Affiliation
+            <span class="text-danger">*</span>
+          </label>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="branch" id="airforce" value="US Air Force" />
+                <label class="form-check-label" for="airforce">US Air Force</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="branch" id="army" value="US Army" />
+                <label class="form-check-label" for="army">US Army</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="branch" id="coastguard" value="US Coast Guard" />
+                <label class="form-check-label" for="coastguard">US Coast Guard</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="branch" id="navy" value="US Navy" />
+                <label class="form-check-label" for="navy">US Navy</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="branch" id="marine" value="US Marine Corps" />
+                <label class="form-check-label" for="marine">US Marine Corps</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="branch" id="spaceforce" value="US Space Force" />
+                <label class="form-check-label" for="spaceforce">US Space Force</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">ETS Date</label>
+          <input type="date" class="form-control" [(ngModel)]="user.ets" name="ets" [disabled]="!isEditMode" />
+        </div>
+      }
+      <div class="mb-3">
+        <label class="form-label">Were you referred by anyone?</label>
+        <input [readonly]="!isEditMode" class="form-control" [(ngModel)]="user.referral" name="referral" />
+      </div>
+    </ng-container>
+  </form>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="close()">Close</button>
+  <button class="btn btn-primary" *ngIf="isEditMode" (click)="save()">Save</button>
+</div>

@@ -16,6 +16,7 @@ export interface NavigationItem {
   link?: string;
   description?: string;
   path?: string;
+  roles?: number[];
 }
 
 export const NavigationItems: NavigationItem[] = [
@@ -26,7 +27,18 @@ export const NavigationItems: NavigationItem[] = [
     classes: 'nav-item',
     url: '/dashboard',
     icon: 'dashboard',
-    breadcrumbs: false
+    breadcrumbs: false,
+    roles: [0, 1, 2]
+  },
+  {
+    id: 'users',
+    title: 'Users',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/users',
+    icon: 'user',
+    breadcrumbs: false,
+    roles: [0]
   },
   {
     id: 'sessions',
@@ -35,7 +47,8 @@ export const NavigationItems: NavigationItem[] = [
     classes: 'nav-item',
     url: '/sessions',
     icon: 'profile',
-    breadcrumbs: false
+    breadcrumbs: false,
+    roles: [0, 1, 2]
   }
 ];
 

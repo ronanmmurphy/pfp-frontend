@@ -23,7 +23,7 @@ export class NewSessionModalComponent implements OnInit {
 
   selectedRadius = 'Nearest to me';
   customLocation = '';
-  locationOptions = ['Nearest to me', 'Within 10 miles', 'Within 50 miles', 'Within 100 miles', 'Custom location…'];
+  locationOptions = ['Nearest to me', 'Within 10 miles', 'Within 50 miles', 'Within 100 miles', 'Custom Radius...'];
 
   photographers: Photographer[] = [
     {
@@ -179,7 +179,7 @@ export class NewSessionModalComponent implements OnInit {
   }
 
   onRadiusChange() {
-    if (this.selectedRadius !== 'Custom') {
+    if (this.selectedRadius !== 'Custom Radius...') {
       this.customLocation = '';
     }
 
@@ -196,8 +196,11 @@ export class NewSessionModalComponent implements OnInit {
       case 'Within 100 miles':
         this.filteredPhotographers = [...this.photographersWithin100Miles];
         break;
+      case 'Custom Radius...':
+        this.filteredPhotographers = [];
+        break;
       default:
-        this.filteredPhotographers = [...this.photographers];
+        this.filteredPhotographers = [];
         break;
     }
 
