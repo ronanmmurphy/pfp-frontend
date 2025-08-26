@@ -1,0 +1,61 @@
+<div class="container py-3">
+  <!-- ADMIN VIEW -->
+  <ng-container *ngIf="role === UserRole.ADMIN; else nonAdmin">
+    <div class="row">
+      <div class="col-md-3"><app-stats-card title="Total Veterans" [value]="veterans"></app-stats-card></div>
+      <div class="col-md-3"><app-stats-card title="Total Photographers" [value]="photographers"></app-stats-card></div>
+      <div class="col-md-3"><app-stats-card title="Successful Sessions" [value]="sessionsCompleted"></app-stats-card></div>
+      <div class="col-md-3"><app-stats-card title="Canceled Sessions" [value]="sessionsCanceled"></app-stats-card></div>
+    </div>
+  </ng-container>
+
+  <!-- PHOTOGRAPHER / VETERAN VIEW -->
+  <ng-template #nonAdmin>
+    <div class="row">
+      <div class="col-md-6"><app-stats-card title="Your Successful Sessions" [value]="mySessionsCompleted"></app-stats-card></div>
+      <div class="col-md-6"><app-stats-card title="Your Canceled Sessions" [value]="mySessionsCanceled"></app-stats-card></div>
+    </div>
+  </ng-template>
+
+  <div class="col-md-12 col-xl-12 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Recent Sessions</h5>
+      <a class="link-primary" (click)="seeMore()" style="cursor: pointer">See more</a>
+    </div>
+    <div class="card tbl-card">
+      <div *ngIf="loadingRecent" class="text-muted mb-2">Loading…</div>
+      <div class="table-responsive" *ngIf="!loadingRecent">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>SESSION NAME</th>
+              <th>PHOTOGRAPHER</th>
+              <th>VETERAN</th>
+              <th>DATE</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (session of recentSessions; track session) {
+              <tr>
+                <td>{{ session.name }}</td>
+                <td>{{ session.photographer.firstName }} {{ session.photographer.lastName }}</td>
+                <td>{{ session.veteran.firstName }} {{ session.veteran.lastName }}</td>
+                <td>{{ session.date }}</td>
+                <td>
+                  <span class="d-block">
+                    <i class="badge-circle f-10 m-r-5" [ngClass]="getBadgeClass(session.status)"></i>
+                    {{ getStatusText(session.status) }}
+                  </span>
+                </td>
+              </tr>
+            }
+            <tr *ngIf="recentSessions.length === 0">
+              <td colspan="5" class="text-muted">No sessions found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

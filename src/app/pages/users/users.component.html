@@ -1,0 +1,116 @@
+<div class="py-3">
+  <!-- Filters -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-5">
+          <label class="form-label">Search</label>
+          <input type="text" class="form-control form-control-sm" placeholder="Search by name..." [formControl]="form.controls.search" />
+        </div>
+        <div class="col-md-5">
+          <label class="form-label">Role</label>
+          <select class="form-control form-control-sm" [formControl]="form.controls.role">
+            <option value="">All</option>
+            <option [ngValue]="UserRole.ADMIN">Admin</option>
+            <option [ngValue]="UserRole.PHOTOGRAPHER">Photographer</option>
+            <option [ngValue]="UserRole.VETERAN">Veteran</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100" (click)="addUser()">Add User</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users -->
+  <div class="card">
+    <div class="card-body">
+      <div *ngIf="loading" class="text-muted mb-2">Loading…</div>
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Phone</th>
+              <th>Location</th>
+              <th>Postal Code</th>
+              <th>Seeking Employment</th>
+              <th>Eligibility</th>
+              <th>Branch Affiliation</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users; trackBy: trackById">
+              <td>{{ getFullName(user.firstName, user.lastName) }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'bg-danger': user.role === UserRole.ADMIN,
+                    'bg-info': user.role === UserRole.PHOTOGRAPHER,
+                    'bg-warning': user.role === UserRole.VETERAN
+                  }"
+                >
+                  {{ getRoleText(user.role) }}
+                </span>
+              </td>
+              <td>{{ user.phoneNumber }}</td>
+              <td>{{ getLocationText(user.streetAddress1, user.streetAddress2, user.city, user.state) }}</td>
+              <td>{{ user.postalCode }}</td>
+              <td>
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'bg-info': user?.seekingEmployment === true,
+                    'bg-danger': user?.seekingEmployment === false
+                  }"
+                  *ngIf="user?.seekingEmployment != null"
+                >
+                  {{ getSeekingEmploymentText(user?.seekingEmployment) }}
+                </span>
+              </td>
+              <td>{{ getEligibilityText(user?.eligibility) }}</td>
+              <td>{{ getMilitaryBranchAffiliationText(user?.militaryBranchAffiliation) }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-2" (click)="editUser(user.id)">Edit</button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteUser(user.id)">Delete</button>
+              </td>
+            </tr>
+            <tr *ngIf="users.length === 0">
+              <td colspan="6" class="text-center">No users found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+          <label class="me-2">Rows per page:</label>
+          <select class="form-select d-inline-block" style="width: auto" [ngModel]="pageSize" (ngModelChange)="changePageSize($event)">
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+            <option [ngValue]="50">50</option>
+          </select>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary" [disabled]="page <= 1" (click)="prevPage()">Prev</button>
+          <span>Page {{ page }} / {{ totalPages }}</span>
+          <button class="btn btn-outline-secondary" [disabled]="page >= totalPages" (click)="nextPage()">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Modal -->
+  <app-user-edit-modal
+    *ngIf="showModal"
+    [user]="modalUser"
+    [isEdit]="isEditModal"
+    (save)="onModalSave()"
+    (cancel)="onModalCancel()"
+  ></app-user-edit-modal>
+</div>

@@ -4,12 +4,10 @@ import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule, Event } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
-// project import
-import { NavigationItem, NavigationItems } from 'src/app/core/layouts/main-layout/navigation/navigation';
-
 // icons
 import { IconService } from '@ant-design/icons-angular';
 import { GlobalOutline, NodeExpandOutline } from '@ant-design/icons-angular/icons';
+import { NavigationItem, NavigationItems } from 'src/app/layouts/main-layout/navigation/navigation';
 
 interface titleType {
   // eslint-disable-next-line

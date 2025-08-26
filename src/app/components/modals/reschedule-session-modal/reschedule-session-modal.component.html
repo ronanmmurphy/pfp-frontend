@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <h5 class="modal-title">Reschedule Session</h5>
+  <button type="button" class="btn-close" (click)="cancel()" [disabled]="loading"></button>
+</div>
+
+<div class="modal-body" [formGroup]="form">
+  <div class="form-group mb-3">
+    <label class="form-label" for="sessionDate">
+      New Session Date
+      <span class="text-danger">*</span>
+    </label>
+    <input
+      id="sessionDate"
+      type="datetime-local"
+      class="form-control"
+      formControlName="date"
+      [ngClass]="{ 'is-invalid': form.get('date')?.touched && form.get('date')?.invalid }"
+    />
+    <div class="invalid-feedback" *ngIf="form.get('date')?.touched && form.get('date')?.hasError('required')">
+      Session date is required.
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" [disabled]="loading">Cancel</button>
+  <button class="btn btn-primary" (click)="submit()" [disabled]="form.invalid || loading">Submit</button>
+</div>
