@@ -43,7 +43,6 @@ export class UserEditModalComponent {
   @Output() cancel = new EventEmitter<void>();
 
   form!: FormGroup;
-  userType: 'photographer' | 'veteran' | 'admin' = 'veteran';
   submitting = false;
   verifying = false;
 
@@ -125,20 +124,47 @@ export class UserEditModalComponent {
   private applyRoleValidators() {
     const role = this.form.get('role')?.value;
     // Clear all role-specific validators
-    this.clearValidators(['website', 'seekingEmployment', 'eligibility', 'militaryBranchAffiliation', 'militaryETSDate']);
+    this.clearValidators([
+      'website',
+      'seekingEmployment',
+      'eligibility',
+      'militaryBranchAffiliation',
+      'militaryETSDate',
+      'phoneNumber',
+      'streetAddress1',
+      'latitude',
+      'longitude'
+    ]);
 
     if (role === UserRole.ADMIN) {
       // No additional fields required for ADMIN
     } else if (role === UserRole.PHOTOGRAPHER) {
-      this.setRequired(['website']);
+      this.setRequired(['website', 'phoneNumber', 'streetAddress1', 'latitude', 'longitude']);
     } else if (role === UserRole.VETERAN) {
-      this.setRequired(['seekingEmployment', 'eligibility', 'militaryBranchAffiliation', 'militaryETSDate']);
+      this.setRequired([
+        'seekingEmployment',
+        'eligibility',
+        'militaryBranchAffiliation',
+        'militaryETSDate',
+        'phoneNumber',
+        'streetAddress1',
+        'latitude',
+        'longitude'
+      ]);
     }
 
     // Update validity for all role-specific fields
-    ['website', 'seekingEmployment', 'eligibility', 'militaryBranchAffiliation', 'militaryETSDate'].forEach((key) =>
-      this.form.get(key)?.updateValueAndValidity()
-    );
+    [
+      'website',
+      'seekingEmployment',
+      'eligibility',
+      'militaryBranchAffiliation',
+      'militaryETSDate',
+      'phoneNumber',
+      'streetAddress1',
+      'latitude',
+      'longitude'
+    ].forEach((key) => this.form.get(key)?.updateValueAndValidity());
   }
 
   private setRequired(keys: string[]) {
