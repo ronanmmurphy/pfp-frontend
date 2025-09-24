@@ -155,7 +155,6 @@
                   <button class="btn btn-outline-primary btn-sm" ngbDropdownToggle [disabled]="loading">Actions</button>
                   <div ngbDropdownMenu>
                     <button ngbDropdownItem (click)="editSession(s)">{{ currentUser?.role === UserRole.VETERAN ? 'View' : 'Edit' }}</button>
-                    <button ngbDropdownItem (click)="openRescheduleModal(s)" *ngIf="currentUser?.role !== UserRole.VETERAN">Delete</button>
                     <button
                       ngbDropdownItem
                       (click)="openRescheduleModal(s)"
