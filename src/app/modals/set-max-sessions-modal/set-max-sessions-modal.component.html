@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <h5 class="modal-title">Update the number of Max Sessions (Monthly)</h5>
+  <button type="button" class="btn-close" (click)="cancel()" [disabled]="loading"></button>
+</div>
+
+<div class="modal-body" [formGroup]="form">
+  <div class="form-group mb-3">
+    <label class="form-label" for="maxSessionsPerMonth">
+      Number of Max Sessions
+      <span class="text-danger">*</span>
+    </label>
+    <input
+      id="maxSessionsPerMonth"
+      type="number"
+      class="form-control"
+      formControlName="maxSessionsPerMonth"
+      [ngClass]="{ 'is-invalid': form.get('maxSessionsPerMonth')?.touched && form.get('maxSessionsPerMonth')?.invalid }"
+    />
+    <div class="invalid-feedback" *ngIf="form.get('maxSessionsPerMonth')?.touched && form.get('maxSessionsPerMonth')?.hasError('required')">
+      Number of Max Sessions is required.
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="cancel()" [disabled]="loading">Cancel</button>
+  <button class="btn btn-primary" (click)="submit()" [disabled]="form.invalid || loading">Submit</button>
+</div>

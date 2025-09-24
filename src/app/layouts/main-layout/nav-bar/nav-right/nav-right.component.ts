@@ -30,7 +30,7 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
 import { Subject, takeUntil, tap } from 'rxjs';
 import { UserRole } from 'src/app/enums/user.enum';
 import { AuthService } from 'src/app/services/auth.service';
-import { getRoleText } from 'src/app/utils/helper';
+import { getRoleText } from 'src/app/utils/user.helper';
 
 @Component({
   selector: 'app-nav-right',
@@ -81,20 +81,21 @@ export class NavRightComponent {
   profile = [
     {
       icon: 'edit',
-      title: 'Edit Profile'
-    },
-    {
-      icon: 'user',
-      title: 'View Profile'
-    },
-    {
-      icon: 'profile',
-      title: 'Social Profile'
-    },
-    {
-      icon: 'wallet',
-      title: 'Billing'
+      title: 'Edit Profile',
+      url: '/profile'
     }
+    // {
+    //   icon: 'user',
+    //   title: 'View Profile'
+    // },
+    // {
+    //   icon: 'profile',
+    //   title: 'Social Profile'
+    // },
+    // {
+    //   icon: 'wallet',
+    //   title: 'Billing'
+    // }
   ];
 
   setting = [
@@ -102,22 +103,22 @@ export class NavRightComponent {
       icon: 'question-circle',
       title: 'Support'
     },
-    {
-      icon: 'user',
-      title: 'Account Settings'
-    },
+    // {
+    //   icon: 'user',
+    //   title: 'Account Settings'
+    // },
     {
       icon: 'lock',
       title: 'Privacy Center'
-    },
-    {
-      icon: 'comment',
-      title: 'Feedback'
-    },
-    {
-      icon: 'unordered-list',
-      title: 'History'
     }
+    // {
+    //   icon: 'comment',
+    //   title: 'Feedback'
+    // },
+    // {
+    //   icon: 'unordered-list',
+    //   title: 'History'
+    // }
   ];
 
   ngOnInit() {

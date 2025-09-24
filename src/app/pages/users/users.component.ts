@@ -3,36 +3,43 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Subject, catchError, debounceTime, switchMap, takeUntil, tap, throwError } from 'rxjs';
-import { CreateUserPayload, UpdateUserPayload, UserPageResponse, UserRow, UserService } from 'src/app/services/user.service';
-import { UserRole } from 'src/app/enums/user.enum';
+import { UserService } from 'src/app/services/user.service';
+import { UserRole, UserStatus } from 'src/app/enums/user.enum';
+import { UserEditModalComponent } from 'src/app/modals/user-edit-modal/user-edit-modal.component';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import {
   getEligibilityText,
   getFullName,
   getLocationText,
   getMilitaryBranchAffiliationText,
   getRoleText,
-  getSeekingEmploymentText
-} from 'src/app/utils/helper';
-import { UserEditModalComponent } from 'src/app/components/modals/user-edit-modal/user-edit-modal.component';
+  getSeekingEmploymentText,
+  getUserStatusText
+} from 'src/app/utils/user.helper';
+import { IUser } from 'src/app/types/user.type';
+import { CreateUserDto } from 'src/app/dtos/user.dto';
+import { IPaginatedResponse } from 'src/app/types/shared.type';
 
 @Component({
   selector: 'app-users',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, UserEditModalComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, UserEditModalComponent, NgbDropdownModule],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss'],
   standalone: true
 })
 export class UsersComponent implements OnInit, OnDestroy {
   UserRole = UserRole;
-  getRoleText = getRoleText;
+  UserStatus = UserStatus;
   getFullName = getFullName;
+  getRoleText = getRoleText;
+  getUserStatusText = getUserStatusText;
   getLocationText = getLocationText;
   getSeekingEmploymentText = getSeekingEmploymentText;
   getEligibilityText = getEligibilityText;
   getMilitaryBranchAffiliationText = getMilitaryBranchAffiliationText;
 
   // table data
-  users: UserRow[] = [];
+  users: IUser[] = [];
   loading = false;
 
   // pagination
@@ -45,23 +52,14 @@ export class UsersComponent implements OnInit, OnDestroy {
 
   // filters
   form = this.fb.group({
-    search: [''],
-    role: ['' as '' | UserRole]
+    search: [null as string | null],
+    role: [null as UserRole | null],
+    status: [null as UserStatus | null]
   });
 
   // Modal state
   showModal = false;
-  modalUser: CreateUserPayload | UpdateUserPayload = {
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    role: UserRole.PHOTOGRAPHER,
-    phoneNumber: '',
-    streetAddress1: '',
-    latitude: null,
-    longitude: null
-  };
+  modalUser!: CreateUserDto | IUser;
   isEditModal = false;
 
   private destroyed$ = new Subject<void>();
@@ -95,12 +93,13 @@ export class UsersComponent implements OnInit, OnDestroy {
     return this.userService
       .getUsers({
         search: v.search ?? undefined,
-        role: (v.role ?? '') as any,
+        role: v.role,
+        status: v.status,
         page: this.page,
         pageSize: this.pageSize
       })
       .pipe(
-        tap((res: UserPageResponse<UserRow>) => {
+        tap((res: IPaginatedResponse<IUser>) => {
           this.users = res.items;
           this.total = res.total;
           this.loading = false;
@@ -140,6 +139,7 @@ export class UsersComponent implements OnInit, OnDestroy {
       firstName: '',
       lastName: '',
       role: UserRole.PHOTOGRAPHER,
+      status: UserStatus.PENDING,
       phoneNumber: '',
       streetAddress1: '',
       latitude: null,
@@ -149,23 +149,26 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.showModal = true;
   }
 
-  editUser(id: number): void {
-    this.loading = true;
-    this.userService
-      .getUserById(id)
-      .pipe(takeUntil(this.destroyed$))
-      .subscribe({
-        next: (user) => {
-          this.modalUser = { ...user };
-          this.isEditModal = true;
-          this.showModal = true;
-          this.loading = false;
-        },
-        error: () => {
-          this.toastr.error('Failed to load user.');
-          this.loading = false;
-        }
-      });
+  editUser(user: any): void {
+    // this.loading = true;
+    // this.userService
+    //   .getUserById(id)
+    //   .pipe(takeUntil(this.destroyed$))
+    //   .subscribe({
+    //     next: (user) => {
+    //       this.modalUser = { ...user };
+    //       this.isEditModal = true;
+    //       this.showModal = true;
+    //       this.loading = false;
+    //     },
+    //     error: () => {
+    //       this.toastr.error('Failed to load user.');
+    //       this.loading = false;
+    //     }
+    //   });
+    this.modalUser = user;
+    this.isEditModal = true;
+    this.showModal = true;
   }
 
   deleteUser(id: number): void {
@@ -185,7 +188,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
   }
 
-  trackById(_: number, row: UserRow) {
+  trackById(_: number, row: IUser) {
     return row.id;
   }
 

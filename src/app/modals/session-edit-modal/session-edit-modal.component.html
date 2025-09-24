@@ -1,0 +1,180 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ isEdit ? 'Edit Session' : 'Create Session' }}</h5>
+  <button type="button" class="btn-close" (click)="cancelSession()" [disabled]="submitting"></button>
+</div>
+<div class="modal-body" [formGroup]="form">
+  <div class="form-group mb-3">
+    <label class="form-label" for="name">
+      Session Name
+      <span class="text-danger">*</span>
+    </label>
+    <input
+      id="name"
+      type="text"
+      class="form-control"
+      formControlName="name"
+      placeholder="Session Name"
+      [ngClass]="{ 'is-invalid': isFormInvalid(form, 'name') }"
+      [disabled]="isVeteran || submitting"
+    />
+    <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'name')">Session name is required.</div>
+  </div>
+
+  <div class="form-group mb-3">
+    <label class="form-label" for="note">Session Note</label>
+    <textarea
+      id="note"
+      class="form-control"
+      formControlName="note"
+      placeholder="Session Note"
+      [disabled]="isVeteran || submitting"
+    ></textarea>
+  </div>
+
+  <div class="form-group mb-3">
+    <label class="form-label" for="status">
+      Status
+      <span class="text-danger">*</span>
+    </label>
+    <select
+      id="status"
+      class="form-control"
+      formControlName="status"
+      [ngClass]="{ 'is-invalid': isFormInvalid(form, 'status') }"
+      [disabled]="isVeteran || submitting"
+    >
+      <option [ngValue]="SessionStatus.SCHEDULED">Scheduled</option>
+      <option [ngValue]="SessionStatus.RESCHEDULED">Rescheduled</option>
+      <option [ngValue]="SessionStatus.COMPLETED">Completed</option>
+      <option [ngValue]="SessionStatus.CANCELED">Canceled</option>
+    </select>
+    <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'status')">Status is required.</div>
+  </div>
+
+  <div class="form-group mb-3">
+    <label class="form-label" for="date">
+      Date
+      <span class="text-danger">*</span>
+    </label>
+    <input
+      id="date"
+      type="datetime-local"
+      class="form-control"
+      formControlName="date"
+      [ngClass]="{ 'is-invalid': isFormInvalid(form, 'date') }"
+      [disabled]="isVeteran || submitting"
+    />
+    <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'date')">Session date is required.</div>
+  </div>
+
+  <div class="form-group mb-3">
+    <label class="form-label" for="expirationDate">Expiration Date</label>
+    <input
+      id="expirationDate"
+      type="datetime-local"
+      class="form-control"
+      formControlName="expirationDate"
+      [disabled]="isVeteran || submitting"
+    />
+  </div>
+
+  <div class="form-group mb-3" *ngIf="!isAdmin">
+    <label class="form-label">Photographer</label>
+    <div class="card p-2">
+      <p>{{ getFullName(session?.photographer.firstName, session?.photographer.lastName) }}</p>
+      <p>{{ session?.photographer.email }}</p>
+      <p>{{ session?.photographer.phoneNumber }}</p>
+      <p>
+        {{
+          getLocationText(
+            session?.photographer.streetAddress1,
+            session?.photographer.streetAddress2,
+            session?.photographer.city,
+            session?.photographer.state,
+            session?.photographer.postalCode
+          )
+        }}
+      </p>
+    </div>
+  </div>
+
+  <div class="form-group mb-3" *ngIf="isAdmin">
+    <label class="form-label">Photographer</label>
+    <ng-select
+      [items]="photographerList"
+      bindLabel="fullName"
+      bindValue="id"
+      placeholder="Search Photographer..."
+      formControlName="photographerId"
+      [searchable]="true"
+      [searchFn]="searchUser"
+      [ngClass]="{ 'is-invalid': isFormInvalid(form, 'photographerId') }"
+      [disabled]="submitting"
+    >
+      <ng-template ng-option-tmp let-item="item">
+        <strong>{{ item.fullName }}</strong>
+        <br />
+        <small>{{ item.email }}</small>
+        <br />
+        <small>{{ item.phoneNumber }}</small>
+        <br />
+        <small>{{ item.location }}</small>
+      </ng-template>
+    </ng-select>
+    <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'photographerId')">Photographer is required.</div>
+  </div>
+
+  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+    <label class="form-label" for="photographerFeedback">Photographer Feedback</label>
+    <textarea
+      id="photographerFeedback"
+      class="form-control"
+      formControlName="photographerFeedback"
+      placeholder="Photograhper Feedback"
+      [disabled]="isVeteran || submitting"
+    ></textarea>
+  </div>
+
+  <div class="form-group mb-3">
+    <label class="form-label">Veteran</label>
+    <ng-select
+      [items]="veteranList"
+      bindLabel="fullName"
+      bindValue="id"
+      placeholder="Search Veteran..."
+      formControlName="veteranId"
+      [searchable]="true"
+      [searchFn]="searchUser"
+      [ngClass]="{ 'is-invalid': isFormInvalid(form, 'veteranId') }"
+      [disabled]="isVeteran || submitting"
+    >
+      <ng-template ng-option-tmp let-item="item">
+        <strong>{{ item.fullName }}</strong>
+        <br />
+        <small>{{ item.email }}</small>
+        <br />
+        <small>{{ item.phoneNumber }}</small>
+        <br />
+        <small>{{ item.location }}</small>
+      </ng-template>
+    </ng-select>
+    <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'veteranId')">Veteran is required.</div>
+  </div>
+
+  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+    <label class="form-label" for="veteranFeedback">Veteran Feedback</label>
+    <textarea
+      id="veteranFeedback"
+      class="form-control"
+      formControlName="veteranFeedback"
+      placeholder="Veteran Feedback"
+      [disabled]="isPhotographer || submitting"
+    ></textarea>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" (click)="saveSession()" [disabled]="submitting">
+    {{ submitting ? 'Saving...' : isEdit ? 'Update' : 'Create' }}
+  </button>
+  <button type="button" class="btn btn-secondary" (click)="cancelSession()" [disabled]="submitting">Cancel</button>
+</div>

@@ -1,0 +1,931 @@
+<div class="modal fade" [ngClass]="{ show: true }" style="display: block" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ isEdit ? 'Edit User' : 'Add User' }}</h5>
+        <button type="button" class="btn-close" (click)="cancelUser()" [disabled]="submitting"></button>
+      </div>
+      <div class="modal-body" [formGroup]="form">
+        <div class="form-group mb-3">
+          <label class="form-label" for="role">
+            Role
+            <span class="text-danger">*</span>
+          </label>
+          <select
+            id="role"
+            class="form-control"
+            formControlName="role"
+            [ngClass]="{ 'is-invalid': isFormInvalid(form, 'role') }"
+            [disabled]="submitting"
+          >
+            <option [ngValue]="UserRole.ADMIN">Admin</option>
+            <option [ngValue]="UserRole.PHOTOGRAPHER">Photographer</option>
+            <option [ngValue]="UserRole.VETERAN">Veteran</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'role')">Role is required.</div>
+        </div>
+
+        <div class="form-group mb-3">
+          <label class="form-label" for="status">
+            Status
+            <span class="text-danger">*</span>
+          </label>
+          <select
+            id="status"
+            class="form-control"
+            formControlName="status"
+            [ngClass]="{ 'is-invalid': isFormInvalid(form, 'status') }"
+            [disabled]="submitting"
+          >
+            <option [ngValue]="UserStatus.PENDING">Pending</option>
+            <option [ngValue]="UserStatus.ONBOARDING">Onboarding</option>
+            <option [ngValue]="UserStatus.APPROVED">Approved</option>
+            <option [ngValue]="UserStatus.DENIED">Denied</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'status')">Status is required.</div>
+        </div>
+
+        <div class="form-group mb-3" *ngIf="f['status'].value === UserStatus.DENIED">
+          <label class="form-label" for="reasonForDenying">
+            Reason for denying
+            <span class="text-danger">*</span>
+          </label>
+          <textarea
+            id="reasonForDenying"
+            class="form-control"
+            formControlName="reasonForDenying"
+            placeholder="Reason for denying"
+            [ngClass]="{ 'is-invalid': isFormInvalid(form, 'reasonForDenying') }"
+            [disabled]="submitting"
+          ></textarea>
+          <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'reasonForDenying')">Reason for denying is required.</div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label class="form-label" for="firstName">
+                First Name
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="firstName"
+                type="text"
+                class="form-control"
+                formControlName="firstName"
+                placeholder="First Name"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'firstName') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'firstName')">First name is required.</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label class="form-label" for="lastName">
+                Last Name
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="lastName"
+                type="text"
+                class="form-control"
+                formControlName="lastName"
+                placeholder="Last Name"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'lastName') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'lastName')">Last name is required.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group mb-3">
+          <label class="form-label" for="email">
+            Email Address
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            id="email"
+            type="email"
+            class="form-control"
+            formControlName="email"
+            placeholder="Email Address"
+            [ngClass]="{ 'is-invalid': isFormInvalid(form, 'email') }"
+            [disabled]="submitting"
+          />
+          <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'email')">
+            {{ isFormError(form, 'email', 'email') ? 'Enter a valid email.' : 'Email is required.' }}
+          </div>
+        </div>
+
+        <ng-container *ngIf="!isEdit">
+          <div class="form-group mb-3">
+            <label class="form-label" for="password">
+              Password
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              id="password"
+              type="password"
+              class="form-control"
+              formControlName="password"
+              placeholder="Password"
+              [ngClass]="{ 'is-invalid': isFormInvalid(form, 'password') }"
+              [disabled]="submitting"
+            />
+            <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'password')">
+              {{ isFormError(form, 'password', 'minlength') ? 'Min 6 characters.' : 'Password is required.' }}
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label" for="passwordConfirm">
+              Confirm Password
+              <span class="text-danger">*</span>
+            </label>
+            <input
+              id="passwordConfirm"
+              type="password"
+              class="form-control"
+              formControlName="passwordConfirm"
+              placeholder="Confirm Password"
+              [disabled]="submitting"
+            />
+            <small
+              class="text-danger"
+              *ngIf="form.errors?.['passwordsMismatch'] && (f['passwordConfirm'].touched || f['password'].touched)"
+            >
+              Passwords do not match
+            </small>
+          </div>
+        </ng-container>
+
+        <div class="form-group mb-3">
+          <label class="form-label" for="phoneNumber">
+            Phone Number
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            id="phoneNumber"
+            type="tel"
+            class="form-control"
+            formControlName="phoneNumber"
+            placeholder="Phone Number"
+            [ngClass]="{ 'is-invalid': isFormInvalid(form, 'phoneNumber') }"
+            [disabled]="submitting"
+          />
+          <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'phoneNumber')">Phone number is required.</div>
+        </div>
+
+        <div class="form-group mb-3">
+          <label class="form-label" for="streetAddress1">
+            Street Address
+            <span class="text-danger">*</span>
+          </label>
+          <input
+            id="streetAddress1"
+            type="text"
+            class="form-control"
+            formControlName="streetAddress1"
+            placeholder="Street Address"
+            [ngClass]="{ 'is-invalid': isFormInvalid(form, 'streetAddress1') }"
+            [disabled]="submitting"
+          />
+          <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'streetAddress1')">Street address is required.</div>
+        </div>
+
+        <div class="form-group mb-3">
+          <label class="form-label" for="streetAddress2">Street Address Line 2</label>
+          <input
+            id="streetAddress2"
+            type="text"
+            class="form-control"
+            formControlName="streetAddress2"
+            placeholder="Street Address Line 2"
+            [disabled]="submitting"
+          />
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label class="form-label" for="city">City</label>
+              <input id="city" type="text" class="form-control" formControlName="city" placeholder="City" [disabled]="submitting" />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label class="form-label" for="state">State</label>
+              <select id="state" class="form-control" formControlName="state" [disabled]="submitting">
+                <option [ngValue]="''">--</option>
+                <option *ngFor="let state of usStates" [ngValue]="state">{{ state }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row align-items-end">
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <label class="form-label" for="postalCode">Postal / Zip Code</label>
+              <input
+                id="postalCode"
+                type="text"
+                class="form-control"
+                formControlName="postalCode"
+                placeholder="Postal / Zip Code"
+                [disabled]="submitting"
+              />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group mb-3">
+              <button type="button" class="btn btn-outline-primary w-100" (click)="verifyAddress()" [disabled]="submitting || verifying">
+                Verify Address
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="verifying" class="text-center mb-3">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <ng-container *ngIf="!verifying && suggestions.length > 0">
+          <div class="form-group mb-3">
+            <label class="form-label">
+              Select your exact address:
+              <span class="text-danger">*</span>
+            </label>
+            <select class="form-control" (change)="selectAddress($event)">
+              <option value="">-- Select --</option>
+              <option *ngFor="let sug of suggestions; let i = index" [value]="i">{{ sug.displayName }}</option>
+            </select>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="selectedDisplay">
+          <p class="text-muted">Selected Address: {{ selectedDisplay }}</p>
+        </ng-container>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label" for="latitude">
+                Latitude
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="latitude"
+                type="number"
+                class="form-control"
+                formControlName="latitude"
+                placeholder="Latitude"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'latitude') }"
+                [readonly]="true"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'latitude')">Latitude is required.</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="form-label" for="longitude">
+                Longitude
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="longitude"
+                type="number"
+                class="form-control"
+                formControlName="longitude"
+                placeholder="Longitude"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'longitude') }"
+                [readonly]="true"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'longitude')">Longitude is required.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-danger" *ngIf="isFormInvalid(form, 'latitude') && f['streetAddress1'].value">
+          Please verify and select your address.
+        </div>
+
+        <ng-container *ngIf="f['role'].value !== UserRole.ADMIN">
+          <ng-container *ngIf="f['role'].value === UserRole.PHOTOGRAPHER">
+            <div class="form-group mb-3">
+              <label class="form-label" for="website">
+                Link To Professional Portfolio
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="website"
+                type="text"
+                class="form-control"
+                formControlName="website"
+                placeholder="Link To Professional Portfolio"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'website') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'website')">Portfolio link is required for photographers.</div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label" for="maxSessionsPerMonth">Number of sessions per month</label>
+              <input
+                id="maxSessionsPerMonth"
+                type="text"
+                class="form-control"
+                formControlName="maxSessionsPerMonth"
+                placeholder="Number of sessions per month"
+                [disabled]="submitting"
+              />
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label" for="mailingStreetAddress1">
+                Mailing Street Address
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="mailingStreetAddress1"
+                type="text"
+                class="form-control"
+                formControlName="mailingStreetAddress1"
+                placeholder="Mailing Street Address"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'mailingStreetAddress1') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'mailingStreetAddress1')">Mailing Street address is required.</div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label" for="mailingStreetAddress2">Mailing Street Address Line 2</label>
+              <input
+                id="mailingStreetAddress2"
+                type="text"
+                class="form-control"
+                formControlName="mailingStreetAddress2"
+                placeholder="Mailing Street Address Line 2"
+                [disabled]="submitting"
+              />
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label" for="mailingCity">Mailing City</label>
+                  <input
+                    id="mailingCity"
+                    type="text"
+                    class="form-control"
+                    formControlName="mailingCity"
+                    placeholder="Mailing City"
+                    [disabled]="submitting"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label class="form-label" for="mailingState">Mailing State</label>
+                  <select id="mailingState" class="form-control" formControlName="mailingState" [disabled]="submitting">
+                    <option [ngValue]="''">--</option>
+                    <option *ngFor="let state of usStates" [ngValue]="state">{{ state }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label" for="mailingPostalCode">Mailing Postal / Zip Code</label>
+                  <input
+                    id="mailingPostalCode"
+                    type="text"
+                    class="form-control"
+                    formControlName="mailingPostalCode"
+                    placeholder="Mailing Postal / Zip Code"
+                    [disabled]="submitting"
+                  />
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label" for="closestBase">
+                    Closest Base
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="closestBase"
+                    type="text"
+                    class="form-control"
+                    formControlName="closestBase"
+                    placeholder="Closest Base"
+                    [ngClass]="{ 'is-invalid': isFormInvalid(form, 'closestBase') }"
+                    [disabled]="submitting"
+                  />
+                  <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'closestBase')">Closest Base is required.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">
+                I agree to submit to a criminal background check
+                <span class="text-danger">*</span>
+              </label>
+              <div class="form-check form-check-inline">
+                <input
+                  id="agreeToCriminalBackgroundCheckYes"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="true"
+                  formControlName="agreeToCriminalBackgroundCheck"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="agreeToCriminalBackgroundCheckYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  id="agreeToCriminalBackgroundCheckNo"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="false"
+                  formControlName="agreeToCriminalBackgroundCheck"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="agreeToCriminalBackgroundCheckNo">No</label>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'agreeToCriminalBackgroundCheck')">
+                Please choose Yes or No.
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label" for="xLink">
+                Link To Your X Profile
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="xLink"
+                type="text"
+                class="form-control"
+                formControlName="xLink"
+                placeholder="Link To Your X Profile"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'xLink') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'xLink')">X Profile link is required.</div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label" for="facebookLink">
+                Link To Your Facebook Profile
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="facebookLink"
+                type="text"
+                class="form-control"
+                formControlName="facebookLink"
+                placeholder="Link To Your Facebook Profile"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'facebookLink') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'facebookLink')">Facebook Profile link is required.</div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label" for="linkedinLink">
+                Link To Your LinkedIn Profile
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="linkedinLink"
+                type="text"
+                class="form-control"
+                formControlName="linkedinLink"
+                placeholder="Link To Your LinkedIn Profile"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'linkedinLink') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'linkedinLink')">LinkedIn Profile link is required.</div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label" for="instagramLink">
+                Link To Your Instagram Profile
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="instagramLink"
+                type="text"
+                class="form-control"
+                formControlName="instagramLink"
+                placeholder="Link To Your Instagram Profile"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'instagramLink') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'instagramLink')">Instagram Profile link is required.</div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">
+                Is studio a home studio?
+                <span class="text-danger">*</span>
+              </label>
+              <div class="form-check form-check-inline">
+                <input
+                  id="homeStudioYes"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="true"
+                  formControlName="isHomeStudio"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="homeStudioYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  id="homeStudioNo"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="false"
+                  formControlName="isHomeStudio"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="homeStudioNo">No</label>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'isHomeStudio')">Please choose Yes or No.</div>
+            </div>
+
+            <ng-container *ngIf="f['isHomeStudio'].value === true">
+              <div class="form-group mb-3">
+                <label class="form-label" for="partOfHomeStudio">
+                  What part of your home is your studio located?
+                  <span class="text-danger">*</span>
+                </label>
+                <input
+                  id="partOfHomeStudio"
+                  type="text"
+                  class="form-control"
+                  formControlName="partOfHomeStudio"
+                  placeholder="What part of your home is your studio located?"
+                  [ngClass]="{ 'is-invalid': isFormInvalid(form, 'partOfHomeStudio') }"
+                  [disabled]="submitting"
+                />
+                <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'partOfHomeStudio')">
+                  Part of your home your studio located is required.
+                </div>
+              </div>
+
+              <div class="form-group mb-3">
+                <label class="form-label">
+                  Is there a separate entrance for your Home Studio?
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="form-check form-check-inline">
+                  <input
+                    id="separateEntranceYes"
+                    class="form-check-input"
+                    type="radio"
+                    [value]="true"
+                    formControlName="isSeparateEntrance"
+                    [disabled]="submitting"
+                  />
+                  <label class="form-check-label" for="separateEntranceYes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input
+                    id="separateEntranceNo"
+                    class="form-check-input"
+                    type="radio"
+                    [value]="false"
+                    formControlName="isSeparateEntrance"
+                    [disabled]="submitting"
+                  />
+                  <label class="form-check-label" for="separateEntranceNo">No</label>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'isSeparateEntrance')">Please choose Yes or No.</div>
+              </div>
+
+              <div class="form-check mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="acknowledgeHomeStudioAgreement"
+                  formControlName="acknowledgeHomeStudioAgreement"
+                  [ngClass]="{ 'is-invalid': isFormInvalid(form, 'acknowledgeHomeStudioAgreement') }"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="acknowledgeHomeStudioAgreement">
+                  I understand that I am solely responsible for all activities that take place on my property in connection with Portraits
+                  For Patriots® sessions. l acknowledge that Portraits For Patriots® does not provide liability insurance or assume
+                  responsibility for any injury, damage, or loss occurring on or around my property. I assume full risk for inviting
+                  individuals into my home and agree that Portraits For Patriots® may contact any person involved in an incident at my
+                  property if needed.
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'acknowledgeHomeStudioAgreement')">
+                  This acknowledgement is required.
+                </div>
+              </div>
+            </ng-container>
+
+            <div class="form-group mb-3">
+              <label class="form-label">Is studio ADA accessible</label>
+              <div class="form-check form-check-inline">
+                <input
+                  id="adaAccessibleYes"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="true"
+                  formControlName="isStudioAdaAccessible"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="adaAccessibleYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  id="adaAccessibleNo"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="false"
+                  formControlName="isStudioAdaAccessible"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="adaAccessibleNo">No</label>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">Upload Studio Space Images</label>
+              <input
+                type="file"
+                class="form-control"
+                (change)="onFileChange($event, 'studioSpaceImages')"
+                [disabled]="submitting"
+                multiple
+                accept="image/*"
+              />
+              <div class="mt-2 d-flex flex-wrap">
+                <img *ngFor="let img of studioSpacePreviews" [src]="img" class="img-thumbnail me-2 mb-2" style="height: 100px" />
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">Upload Proof of Insurance</label>
+              <input
+                type="file"
+                class="form-control"
+                (change)="onFileChange($event, 'proofOfInsuranceImages')"
+                [disabled]="submitting"
+                multiple
+                accept="image/*"
+              />
+              <div class="mt-2 d-flex flex-wrap">
+                <img *ngFor="let img of insurancePreviews" [src]="img" class="img-thumbnail me-2 mb-2" style="height: 100px" />
+              </div>
+            </div>
+
+            <div class="form-check mb-3">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="agreeToVolunteerAgreement"
+                formControlName="agreeToVolunteerAgreement"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'agreeToVolunteerAgreement') }"
+                [disabled]="submitting"
+              />
+              <label class="form-check-label" for="agreeToVolunteerAgreement">
+                Agree to the
+                <span>
+                  <a
+                    class="text-primary"
+                    href="https://docs.google.com/document/d/1V6MF-1DzuTmoEIHjBw1ZymVv9F4InV5iWoPpm7CVenM/edit?tab=t.0"
+                    target="_blank"
+                  >
+                    Portraits For Patriots Volunteer Agreement
+                  </a>
+                </span>
+                <span class="text-danger">*</span>
+              </label>
+              <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'agreeToVolunteerAgreement')">
+                This agreement is required.
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="f['role'].value === UserRole.VETERAN">
+            <div class="form-group mb-3">
+              <label class="form-label">
+                Are You Currently Seeking Employment?
+                <span class="text-danger">*</span>
+              </label>
+              <div class="form-check form-check-inline">
+                <input
+                  id="seekYes"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="true"
+                  formControlName="seekingEmployment"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="seekYes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  id="seekNo"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="false"
+                  formControlName="seekingEmployment"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="seekNo">No</label>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'seekingEmployment')">Please choose Yes or No.</div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label" for="linkedinProfile">LinkedIn Profile</label>
+              <input
+                id="linkedinProfile"
+                type="url"
+                class="form-control"
+                formControlName="linkedinProfile"
+                placeholder="LinkedIn Profile"
+                [disabled]="submitting"
+              />
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">
+                Please Select Your Eligibility
+                <span class="text-danger">*</span>
+              </label>
+              <div class="form-check">
+                <input
+                  id="tsm"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="Eligibility.TRANSITIONING_SERVICE_MEMBER"
+                  formControlName="eligibility"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="tsm">Transitioning Service Member</label>
+              </div>
+              <div class="form-check">
+                <input
+                  id="gsfm"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="Eligibility.GOLD_STAR_FAMILY_MEMBER"
+                  formControlName="eligibility"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="gsfm">Gold Star Family Member</label>
+              </div>
+              <div class="form-check">
+                <input
+                  id="spouse"
+                  class="form-check-input"
+                  type="radio"
+                  [value]="Eligibility.MILITARY_SPOUSE"
+                  formControlName="eligibility"
+                  [disabled]="submitting"
+                />
+                <label class="form-check-label" for="spouse">Military Spouse</label>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'eligibility')">Please select your eligibility.</div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label">
+                Military Branch Affiliation
+                <span class="text-danger">*</span>
+              </label>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-check">
+                    <input
+                      id="airforce"
+                      class="form-check-input"
+                      type="radio"
+                      [value]="MilitaryBranchAffiliation.US_AIR_FORCE"
+                      formControlName="militaryBranchAffiliation"
+                      [disabled]="submitting"
+                    />
+                    <label class="form-check-label" for="airforce">US Air Force</label>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      id="army"
+                      class="form-check-input"
+                      type="radio"
+                      [value]="MilitaryBranchAffiliation.US_ARMY"
+                      formControlName="militaryBranchAffiliation"
+                      [disabled]="submitting"
+                    />
+                    <label class="form-check-label" for="army">US Army</label>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      id="coastguard"
+                      class="form-check-input"
+                      type="radio"
+                      [value]="MilitaryBranchAffiliation.US_COAST_GUARD"
+                      formControlName="militaryBranchAffiliation"
+                      [disabled]="submitting"
+                    />
+                    <label class="form-check-label" for="coastguard">US Coast Guard</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check">
+                    <input
+                      id="navy"
+                      class="form-check-input"
+                      type="radio"
+                      [value]="MilitaryBranchAffiliation.US_NAVY"
+                      formControlName="militaryBranchAffiliation"
+                      [disabled]="submitting"
+                    />
+                    <label class="form-check-label" for="navy">US Navy</label>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      id="marine"
+                      class="form-check-input"
+                      type="radio"
+                      [value]="MilitaryBranchAffiliation.US_MARINE_CORPS"
+                      formControlName="militaryBranchAffiliation"
+                      [disabled]="submitting"
+                    />
+                    <label class="form-check-label" for="marine">US Marine Corps</label>
+                  </div>
+                  <div class="form-check">
+                    <input
+                      id="spaceforce"
+                      class="form-check-input"
+                      type="radio"
+                      [value]="MilitaryBranchAffiliation.US_SPACE_FORCE"
+                      formControlName="militaryBranchAffiliation"
+                      [disabled]="submitting"
+                    />
+                    <label class="form-check-label" for="spaceforce">US Space Force</label>
+                  </div>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'militaryBranchAffiliation')">
+                  Please select your branch.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <label class="form-label" for="militaryETSDate">
+                Military ETS Date
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="militaryETSDate"
+                type="date"
+                class="form-control"
+                formControlName="militaryETSDate"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'militaryETSDate') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'militaryETSDate')">Please select Military ETS Date.</div>
+            </div>
+          </ng-container>
+
+          <div class="form-group mb-3">
+            <label class="form-label" for="referredBy">Were you referred by anyone?</label>
+            <input
+              id="referredBy"
+              type="text"
+              class="form-control"
+              formControlName="referredBy"
+              placeholder="Were you referred by anyone?"
+              [disabled]="submitting"
+            />
+          </div>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" (click)="saveUser()" [disabled]="submitting">
+          {{ submitting ? 'Saving...' : isEdit ? 'Update' : 'Create' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="cancelUser()" [disabled]="submitting">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

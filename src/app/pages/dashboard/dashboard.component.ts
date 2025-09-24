@@ -2,9 +2,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { combineLatest, forkJoin, of, Subject, switchMap } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { DashboardService, SessionRow } from '../../services/dashboard.service';
-import { UserRole } from 'src/app/enums/user.enum';
-import { getBadgeClass, getStatusText } from 'src/app/utils/helper';
+import { AdminStats, DashboardService, SessionRow, UserStats } from '../../services/dashboard.service';
+import { UserRole, UserStatus } from 'src/app/enums/user.enum';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { StatsCardComponent } from 'src/app/components/shared/stats-card/stats-card.component';
@@ -19,6 +18,7 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   UserRole = UserRole;
+  UserStatus = UserStatus;
 
   // role & user
   role?: UserRole;
@@ -26,21 +26,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // admin totals
   veterans = 0;
   photographers = 0;
+  pendingPhotographers = 0;
+  onboardingPhotographers = 0;
+  approvedPhotographers = 0;
+  deniedPhotographers = 0;
   sessionsCompleted = 0;
   sessionsCanceled = 0;
+  sessionsActive = 0;
 
   // user totals (photographer / veteran)
   mySessionsCompleted = 0;
   mySessionsCanceled = 0;
+  mySessionsActive = 0;
 
-  // recent sessions
-  recentSessions: SessionRow[] = [];
-  loadingRecent = true;
+  loading = true;
 
   private destroyed$ = new Subject<void>();
-
-  getBadgeClass = getBadgeClass;
-  getStatusText = getStatusText;
 
   constructor(
     private auth: AuthService,
@@ -53,46 +54,46 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((user) => {
           this.role = user.role;
-
           const stats$ = user.role === UserRole.ADMIN ? this.dash.getAdminStats() : this.dash.getMyStats();
-
-          const sessions$ = this.dash.getRecentSessions(10);
-
-          return forkJoin([stats$, sessions$]).pipe(
+          return stats$.pipe(
             catchError((err) => {
-              console.error('Dashboard load error', err);
-              return of([null, []]);
+              console.error('Failed to load stats', err);
+              return of(null);
             })
           );
         }),
         takeUntil(this.destroyed$)
       )
-      .subscribe({
-        next: ([stats, sessions]: any) => {
-          if (this.role === UserRole.ADMIN) {
-            this.veterans = stats.veterans;
-            this.photographers = stats.photographers;
-            this.sessionsCompleted = stats.sessionsCompleted;
-            this.sessionsCanceled = stats.sessionsCanceled;
-          } else {
-            this.mySessionsCompleted = stats.sessionsCompleted;
-            this.mySessionsCanceled = stats.sessionsCanceled;
-          }
-          this.recentSessions = sessions;
-          this.loadingRecent = false;
-        },
-        error: () => {
-          this.loadingRecent = false;
+      .subscribe((stats) => {
+        if (!stats) {
+          this.loading = false;
+          return;
         }
+
+        if (this.role === UserRole.ADMIN) {
+          const adminStats = stats as AdminStats;
+          this.veterans = adminStats.veterans;
+          this.photographers = adminStats.photographers;
+          this.pendingPhotographers = adminStats.pendingPhotographers;
+          this.onboardingPhotographers = adminStats.onboardingPhotographers;
+          this.approvedPhotographers = adminStats.approvedPhotographers;
+          this.deniedPhotographers = adminStats.deniedPhotographers;
+          this.sessionsCompleted = adminStats.sessionsCompleted;
+          this.sessionsCanceled = adminStats.sessionsCanceled;
+          this.sessionsActive = adminStats.sessionsActive;
+        } else {
+          const userStats = stats as UserStats;
+          this.mySessionsCompleted = userStats.sessionsCompleted;
+          this.mySessionsCanceled = userStats.sessionsCanceled;
+          this.sessionsActive = userStats.sessionsActive;
+        }
+
+        this.loading = false;
       });
   }
 
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
-  }
-
-  seeMore() {
-    this.router.navigate(['/sessions']);
   }
 }

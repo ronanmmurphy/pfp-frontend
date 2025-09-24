@@ -5,6 +5,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { SessionService } from 'src/app/services/session.service';
 import { SessionStatus } from 'src/app/enums/session.enum';
+import { formatDateTimeLocal } from 'src/app/utils/date.helper';
 
 @Component({
   selector: 'app-reschedule-session-modal',
@@ -31,7 +32,10 @@ export class RescheduleSessionModalComponent {
   }
 
   ngOnInit() {
-    this.form.patchValue({ date: this.currentDate });
+    // Convert ISO string to datetime-local compatible format (YYYY-MM-DDTHH:mm)
+    const date = new Date(this.currentDate);
+    const formattedDate = formatDateTimeLocal(date);
+    this.form.patchValue({ date: formattedDate });
   }
 
   submit() {
@@ -43,7 +47,7 @@ export class RescheduleSessionModalComponent {
 
     this.loading = true;
     const newDate = this.form.get('date')?.value;
-    this.sessionService.updateSession(this.sessionId, { date: newDate, status: SessionStatus.RESCHEDULE_REQUESTED }).subscribe({
+    this.sessionService.updateSession(this.sessionId, { date: newDate, status: SessionStatus.RESCHEDULED }).subscribe({
       next: () => {
         this.toastr.success('Session rescheduled successfully.');
         this.loading = false;

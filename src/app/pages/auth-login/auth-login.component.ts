@@ -1,9 +1,10 @@
-// project import
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { Subject, takeUntil } from 'rxjs';
+import { UserStatus } from 'src/app/enums/user.enum';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -18,11 +19,18 @@ export class AuthLoginComponent {
 
   loading = false;
 
+  private destroyed$ = new Subject<void>();
+
   constructor(
     private auth: AuthService,
     private router: Router,
     private toastr: ToastrService
   ) {}
+
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
+  }
 
   login() {
     if (!this.email?.trim() || !this.password) {
@@ -31,15 +39,28 @@ export class AuthLoginComponent {
     }
 
     this.loading = true;
-    this.auth.signin(this.email.trim(), this.password).subscribe({
-      next: () => {
-        this.loading = false;
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        this.loading = false;
-        this.toastr.error(err?.error?.message || 'Invalid email or password.');
-      }
-    });
+    this.auth
+      .signin({ email: this.email.trim(), password: this.password })
+      .pipe(takeUntil(this.destroyed$))
+      .subscribe({
+        next: (user) => {
+          this.loading = false;
+          if (user.status === UserStatus.PENDING) {
+            this.auth.logout();
+            this.toastr.error('Your account is still under review.');
+            this.router.navigate(['/login']);
+          } else if (user.status === UserStatus.ONBOARDING) {
+            this.toastr.success('Logged in successfully!');
+            this.router.navigate(['/onboarding']);
+          } else if (user.status === UserStatus.APPROVED) {
+            this.toastr.success('Logged in successfully!');
+            this.router.navigate(['/dashboard']);
+          }
+        },
+        error: (err) => {
+          this.loading = false;
+          this.toastr.error(err?.error?.message || 'Invalid email or password.');
+        }
+      });
   }
 }

@@ -1,0 +1,106 @@
+<div class="modal-header">
+  <h5 class="modal-title">Get a Referral</h5>
+  <button type="button" class="btn-close" (click)="close()" [disabled]="loading"></button>
+</div>
+
+<div class="modal-body">
+  <!-- Veteran Location -->
+  <p class="mb-2">
+    <strong>Your Location:</strong>
+  </p>
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <p *ngIf="!useCustomLocation">
+      {{ getLocationText(user?.streetAddress1, user?.streetAddress2, user?.city, user?.state, user?.postalCode) }}
+    </p>
+    <div *ngIf="useCustomLocation" style="flex: 1 1 auto">
+      <ng-select
+        [items]="suggestions"
+        bindLabel="displayName"
+        [typeahead]="addressInput$"
+        placeholder="Search for address"
+        [(ngModel)]="selectedAddress"
+        (change)="onSelectAddress($event)"
+      ></ng-select>
+    </div>
+    <button class="btn btn-primary btm-sm ms-2" (click)="toggleLocationMode()">{{ useCustomLocation ? 'Base' : 'Custom' }}</button>
+  </div>
+  <div class="mb-3">
+    <p>
+      <strong>Latitude:</strong>
+      {{ latitude }}
+    </p>
+    <p>
+      <strong>Longitude:</strong>
+      {{ longitude }}
+    </p>
+  </div>
+
+  <!-- Location Filter -->
+  <div class="mb-3">
+    <label class="form-label"><strong>Search for photographers within:</strong></label>
+    <select class="form-control" [(ngModel)]="selectedRadius" (ngModelChange)="onRadiusChange()" [ngModelOptions]="{ standalone: true }">
+      <option *ngFor="let option of locationOptions" [value]="option">
+        {{ option === 'Nearest to me' ? option : option === 'Custom Radius...' ? option : 'Within ' + option }}
+      </option>
+    </select>
+    <div *ngIf="selectedRadius === 'Custom Radius...'" class="d-flex align-items-center gap-2 mt-3">
+      <input
+        class="form-control"
+        type="number"
+        placeholder="Enter radius in miles"
+        [(ngModel)]="customRadius"
+        [ngModelOptions]="{ standalone: true }"
+        min="1"
+      />
+      <button class="btn btn-primary" (click)="onRadiusChange()" [disabled]="!customRadius || loading">Search</button>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div class="map-container mb-3">
+    <div id="leafletMap" class="rounded border" style="height: 300px"></div>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="text-center mb-3">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Photographer Table -->
+  <div class="table-responsive" *ngIf="!loading && photographers.length > 0">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Contact</th>
+          <th>Location</th>
+          <th>Distance (miles)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let photographer of photographers">
+          <td>{{ getFullName(photographer.firstName, photographer.lastName) }}</td>
+          <td>
+            <p>{{ photographer.email || 'No Email' }}</p>
+            <p>{{ photographer.phoneNumber || 'No Phone' }}</p>
+          </td>
+          <td>
+            {{
+              getLocationText(
+                photographer.streetAddress1,
+                photographer?.streetAddress2,
+                photographer?.city,
+                photographer?.state,
+                photographer?.postalCode
+              )
+            }}
+          </td>
+          <td>{{ photographer.distance.toFixed(2) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div *ngIf="!loading && photographers.length === 0" class="alert alert-info">No photographers found within the selected radius.</div>
+</div>

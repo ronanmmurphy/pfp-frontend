@@ -27,6 +27,16 @@ const routes: Routes = [
         path: 'sessions',
         loadComponent: () => import('./pages/sessions/sessions.component').then((c) => c.SessionsComponent),
         canActivate: [AuthGuard]
+      },
+      {
+        path: 'onboarding',
+        loadComponent: () => import('./pages/onboarding/onboarding.component').then((c) => c.OnboardingComponent),
+        canActivate: [AuthGuard]
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./pages/profile/profile.component').then((c) => c.ProfileComponent),
+        canActivate: [AuthGuard]
       }
     ]
   },

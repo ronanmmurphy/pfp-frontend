@@ -8,6 +8,7 @@ File: style.css
 =================================================================================== */
 
 @import 'ngx-toastr/toastr';
+@import '~@ng-select/ng-select/themes/default.theme.css';
 
 // main framework
 @import 'node_modules/bootstrap/scss/functions';
@@ -44,4 +45,18 @@ File: style.css
   width: 8px;
   height: 8px;
   border-radius: 50%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0px;
+}
+
+small {
+  font-size: 1rem;
 }

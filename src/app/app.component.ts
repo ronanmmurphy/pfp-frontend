@@ -2,6 +2,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -9,4 +10,6 @@ import { SpinnerComponent } from './shared/components/spinner/spinner.component'
   styleUrls: ['./app.component.scss'],
   imports: [RouterOutlet, SpinnerComponent]
 })
-export class AppComponent {}
+export class AppComponent {
+  constructor(public authService: AuthService) {}
+}

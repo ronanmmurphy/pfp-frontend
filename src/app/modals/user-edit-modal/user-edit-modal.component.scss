@@ -1,0 +1,29 @@
+.modal {
+  &.show {
+    display: block;
+  }
+}
+
+.modal-dialog {
+  max-width: 900px;
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+.btn {
+  min-width: 100px;
+}
+
+.form-check {
+  margin-bottom: 0.5rem;
+}
+
+.text-danger {
+  font-size: 0.9rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}

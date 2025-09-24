@@ -24,7 +24,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": ["src/favicon.ico", "src/favicon.png", "src/assets"],
             "styles": ["node_modules/leaflet/dist/leaflet.css", "src/styles.scss"],
             "scripts": ["node_modules/leaflet/dist/leaflet.js"]
           },
@@ -87,7 +87,7 @@
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": ["src/favicon.ico", "favicon.png", "src/assets"],
             "styles": ["src/styles.scss"],
             "scripts": []
           }

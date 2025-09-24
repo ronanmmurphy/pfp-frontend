@@ -2,57 +2,34 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SessionStatus } from '../enums/session.enum';
-
-export interface SessionQuery {
-  search?: string;
-  status?: SessionStatus | '';
-  dateFrom?: string;
-  dateTo?: string;
-  page?: number;
-  pageSize?: number;
-}
-
-export interface SessionListItem {
-  id: number;
-  name: string;
-  note?: string;
-  date: string;
-  expirationDate?: string;
-  status: SessionStatus;
-  photographer: any;
-  veteran: any;
-}
-
-export interface PageResponse<T> {
-  items: T[];
-  total: number;
-  page: number;
-  pageSize: number;
-}
+import { CreateSessionDto, GetSessionsQuery, UpdateSessionDto } from '../dtos/session.dto';
+import { IPaginatedResponse } from '../types/shared.type';
+import { ISession } from '../types/session.type';
 
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   constructor(private http: HttpClient) {}
 
-  getSessions(paramsIn: SessionQuery): Observable<PageResponse<SessionListItem>> {
+  createSession(payload: CreateSessionDto): Observable<ISession> {
+    return this.http.post<ISession>('/sessions', payload);
+  }
+
+  getSessions(query: GetSessionsQuery): Observable<IPaginatedResponse<ISession>> {
     let params = new HttpParams();
-    if (paramsIn.search) params = params.set('search', paramsIn.search.trim());
-    if (paramsIn.status !== undefined && paramsIn.status !== '') {
-      params = params.set('status', String(paramsIn.status));
+
+    if (query?.search) params = params.set('search', query.search.trim());
+    if (query?.status !== undefined && query?.status !== null) {
+      params = params.set('status', String(query.status));
     }
-    if (paramsIn.dateFrom) params = params.set('dateFrom', paramsIn.dateFrom);
-    if (paramsIn.dateTo) params = params.set('dateTo', paramsIn.dateTo);
-    if (paramsIn.page) params = params.set('page', String(paramsIn.page));
-    if (paramsIn.pageSize) params = params.set('pageSize', String(paramsIn.pageSize));
+    if (query?.dateFrom) params = params.set('dateFrom', query.dateFrom);
+    if (query?.dateTo) params = params.set('dateTo', query.dateTo);
+    if (query?.page) params = params.set('page', String(query.page));
+    if (query?.pageSize) params = params.set('pageSize', String(query.pageSize));
 
-    return this.http.get<PageResponse<SessionListItem>>('/sessions', { params });
+    return this.http.get<IPaginatedResponse<ISession>>('/sessions', { params });
   }
 
-  createSession(payload: any): Observable<any> {
-    return this.http.post<any>('/sessions', payload);
-  }
-
-  updateSession(id: number, update: { status?: SessionStatus; date?: string }): Observable<any> {
-    return this.http.patch(`/sessions/${id}`, update);
+  updateSession(id: number, payload: UpdateSessionDto): Observable<ISession> {
+    return this.http.patch<ISession>(`/sessions/${id}`, payload);
   }
 }

@@ -111,7 +111,7 @@
           <ng-template ngbNavContent>
             @for (task of profile; track task) {
               <div>
-                <a class="dropdown-item">
+                <a class="dropdown-item" [routerLink]="[task.url]">
                   <i class="text-muted" antIcon theme="outline" type="{{ task.icon }}"></i>
                   <span>{{ task.title }}</span>
                 </a>

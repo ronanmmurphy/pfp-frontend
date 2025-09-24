@@ -3,7 +3,32 @@
   <div class="card mb-3">
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        <div class="col-md-4">
+        <div class="col-md-2">
+          <label class="form-label">View</label>
+          <div class="btn-group w-100" role="group">
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm"
+              [class.active]="selectedView === 'thisMonth'"
+              (click)="setView('thisMonth')"
+            >
+              This Month
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary btn-sm"
+              [class.active]="selectedView === 'waitlist'"
+              (click)="setView('waitlist')"
+            >
+              Waitlist
+            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm" [class.active]="selectedView === 'all'" (click)="setView('all')">
+              All
+            </button>
+          </div>
+        </div>
+
+        <div class="col-md-2">
           <label class="form-label">Search</label>
           <input
             type="text"
@@ -16,10 +41,9 @@
         <div class="col-md-2">
           <label class="form-label">Status</label>
           <select class="form-control form-control-sm" [formControl]="form.controls.status">
-            <option value="">All</option>
-            <option [ngValue]="SessionStatus.REQUESTED">Requested</option>
+            <option value="null">All</option>
             <option [ngValue]="SessionStatus.SCHEDULED">Scheduled</option>
-            <option [ngValue]="SessionStatus.RESCHEDULE_REQUESTED">Reschedule Requested</option>
+            <option [ngValue]="SessionStatus.RESCHEDULED">Rescheduled</option>
             <option [ngValue]="SessionStatus.COMPLETED">Completed</option>
             <option [ngValue]="SessionStatus.CANCELED">Canceled</option>
           </select>
@@ -36,8 +60,11 @@
         </div>
 
         <div class="col-md-2">
-          <button class="btn btn-primary w-100 mb-2" type="button" (click)="requestSession()" *ngIf="role === UserRole.VETERAN">
-            Request a Session
+          <button class="btn btn-primary w-100 mb-2" type="button" (click)="createSession()" *ngIf="currentUser?.role !== UserRole.VETERAN">
+            Create a Session
+          </button>
+          <button class="btn btn-primary w-100 mb-2" type="button" (click)="getReferral()" *ngIf="currentUser?.role === UserRole.VETERAN">
+            Get a Referral
           </button>
           <button class="btn btn-outline-primary w-100" (click)="resetFilters()">Reset</button>
         </div>
@@ -47,6 +74,17 @@
 
   <!-- Sessions -->
   <div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h4>
+        {{ selectedView === 'thisMonth' ? 'Sessions of This Month' : selectedView === 'waitlist' ? 'Waitlist' : 'All Sessions' }}
+      </h4>
+      <div *ngIf="currentUser?.role === UserRole.PHOTOGRAPHER" class="d-flex align-items-center gap-4">
+        <h5>{{ rows.length }} sessions / {{ currentUser?.maxSessionsPerMonth || 'NaN' }}</h5>
+        <button class="btn btn-primary" (click)="setMaxSessionsPerMonth()">
+          <i antIcon type="setting" theme="outline"></i>
+        </button>
+      </div>
+    </div>
     <div class="card-body">
       <div *ngIf="loading" class="text-muted mb-2">Loading…</div>
 
@@ -56,14 +94,14 @@
             <tr>
               <th>Session Name</th>
               <th>Date</th>
-              <th *ngIf="role !== UserRole.PHOTOGRAPHER">Photographer</th>
-              <th *ngIf="role === UserRole.VETERAN">Location</th>
-              <th *ngIf="role === UserRole.VETERAN">Postal Code</th>
-              <th *ngIf="role !== UserRole.VETERAN">Veteran</th>
-              <th *ngIf="role === UserRole.PHOTOGRAPHER">Location</th>
-              <th *ngIf="role === UserRole.PHOTOGRAPHER">Postal Code</th>
-              <th>Expiration</th>
               <th>Status</th>
+              <th *ngIf="currentUser?.role !== UserRole.PHOTOGRAPHER">Photographer</th>
+              <th *ngIf="currentUser?.role === UserRole.VETERAN">Contact</th>
+              <th *ngIf="currentUser?.role === UserRole.VETERAN">Location</th>
+              <th *ngIf="currentUser?.role !== UserRole.VETERAN">Veteran</th>
+              <th *ngIf="currentUser?.role === UserRole.PHOTOGRAPHER">Contact</th>
+              <th *ngIf="currentUser?.role === UserRole.PHOTOGRAPHER">Location</th>
+              <th>Expiration</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -71,55 +109,80 @@
             <tr *ngFor="let s of rows; trackBy: trackById">
               <td>{{ s.name }}</td>
               <td>{{ s.date | date: 'medium' }}</td>
-              <td *ngIf="role !== UserRole.PHOTOGRAPHER">{{ fullName(s.photographer) }}</td>
-              <td *ngIf="role === UserRole.VETERAN">{{ locationOf(s.photographer) }}</td>
-              <td *ngIf="role === UserRole.VETERAN">{{ s.photographer?.postalCode || '' }}</td>
-              <td *ngIf="role !== UserRole.VETERAN">{{ fullName(s.veteran) }}</td>
-              <td *ngIf="role === UserRole.PHOTOGRAPHER">{{ locationOf(s.veteran) }}</td>
-              <td *ngIf="role === UserRole.PHOTOGRAPHER">{{ s.veteran?.postalCode || '' }}</td>
-              <td>{{ s.expirationDate | date: 'medium' }}</td>
-              <!-- <td>
-                  <span class="badge" [ngClass]="getBadgeClass(s.status)">{{ getStatusText(s.status) }}</span>
-                </td> -->
               <td>
                 <span class="d-block">
-                  <i class="badge-circle f-10 m-r-5" [ngClass]="getBadgeClass(s.status)"></i>
-                  {{ getStatusText(s.status) }}
+                  <i class="badge-circle f-10 m-r-5" [ngClass]="getSessionBadgeClass(s.status)"></i>
+                  {{ getSessionStatusText(s.status) }}
                 </span>
               </td>
+              <td *ngIf="currentUser?.role !== UserRole.PHOTOGRAPHER">
+                {{ getFullName(s.photographer.firstName, s.photographer.lastName) }}
+              </td>
+              <td *ngIf="currentUser?.role === UserRole.VETERAN">
+                <p>{{ s.photographer?.email || 'No Email' }}</p>
+                <p>{{ s.photographer?.phoneNumber || 'No Phone' }}</p>
+              </td>
+              <td *ngIf="currentUser?.role === UserRole.VETERAN">
+                {{
+                  getLocationText(
+                    s.photographer.streetAddress1,
+                    s.photographer?.streetAddress2,
+                    s.photographer?.city,
+                    s.photographer?.state,
+                    s.photographer?.postalCode
+                  )
+                }}
+              </td>
+              <td *ngIf="currentUser?.role !== UserRole.VETERAN">{{ getFullName(s.veteran.firstName, s.veteran.lastName) }}</td>
+              <td *ngIf="currentUser?.role === UserRole.PHOTOGRAPHER">
+                <p>{{ s.veteran?.email || 'No Email' }}</p>
+                <p>{{ s.veteran?.phoneNumber || 'No Phone' }}</p>
+              </td>
+              <td *ngIf="currentUser?.role === UserRole.PHOTOGRAPHER">
+                {{
+                  getLocationText(
+                    s.veteran.streetAddress1,
+                    s.veteran?.streetAddress2,
+                    s.veteran?.city,
+                    s.veteran?.state,
+                    s.veteran?.postalCode
+                  )
+                }}
+              </td>
+              <td>{{ s.expirationDate | date: 'medium' }}</td>
               <td>
                 <div ngbDropdown class="d-inline-block" container="body">
                   <button class="btn btn-outline-primary btn-sm" ngbDropdownToggle [disabled]="loading">Actions</button>
                   <div ngbDropdownMenu>
+                    <button ngbDropdownItem (click)="editSession(s)">{{ currentUser?.role === UserRole.VETERAN ? 'View' : 'Edit' }}</button>
+                    <button ngbDropdownItem (click)="openRescheduleModal(s)" *ngIf="currentUser?.role !== UserRole.VETERAN">Delete</button>
                     <button
                       ngbDropdownItem
                       (click)="openRescheduleModal(s)"
-                      *ngIf="s.status === SessionStatus.RESCHEDULE_REQUESTED || s.status === SessionStatus.REQUESTED"
+                      *ngIf="
+                        currentUser?.role !== UserRole.VETERAN &&
+                        (s.status === SessionStatus.SCHEDULED || s.status === SessionStatus.RESCHEDULED)
+                      "
                     >
                       Reschedule
                     </button>
                     <button
                       ngbDropdownItem
-                      (click)="updateSessionStatus(s.id, SessionStatus.SCHEDULED)"
-                      *ngIf="
-                        (role === UserRole.PHOTOGRAPHER && s.status === SessionStatus.REQUESTED) ||
-                        (role === UserRole.PHOTOGRAPHER && s.status === SessionStatus.RESCHEDULE_REQUESTED) ||
-                        (role === UserRole.VETERAN && s.status === SessionStatus.RESCHEDULE_REQUESTED)
-                      "
-                    >
-                      Approve
-                    </button>
-                    <button
-                      ngbDropdownItem
                       (click)="updateSessionStatus(s.id, SessionStatus.COMPLETED)"
-                      *ngIf="s.status === SessionStatus.RESCHEDULE_REQUESTED || s.status === SessionStatus.REQUESTED"
+                      *ngIf="
+                        currentUser?.role !== UserRole.VETERAN &&
+                        (s.status === SessionStatus.SCHEDULED || s.status === SessionStatus.RESCHEDULED)
+                      "
                     >
                       Complete
                     </button>
                     <button
                       ngbDropdownItem
                       (click)="updateSessionStatus(s.id, SessionStatus.CANCELED)"
-                      *ngIf="s.status === SessionStatus.RESCHEDULE_REQUESTED || s.status === SessionStatus.REQUESTED"
+                      *ngIf="
+                        currentUser?.role !== UserRole.VETERAN &&
+                        (s.status === SessionStatus.SCHEDULED || s.status === SessionStatus.RESCHEDULED)
+                      "
                     >
                       Cancel
                     </button>
@@ -128,7 +191,7 @@
               </td>
             </tr>
             <tr *ngIf="rows.length === 0">
-              <td colspan="7" class="text-muted">No sessions found.</td>
+              <td class="text-muted">No sessions found.</td>
             </tr>
           </tbody>
         </table>

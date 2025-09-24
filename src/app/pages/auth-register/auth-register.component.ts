@@ -1,13 +1,15 @@
-// Angular import
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { US_STATES } from 'src/app/consts/us-states.const';
-import { Eligibility, MilitaryBranchAffiliation, UserRole } from 'src/app/enums/user.enum';
+import { Eligibility, MilitaryBranchAffiliation, UserRole, UserStatus } from 'src/app/enums/user.enum';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/services/auth.service';
+import { UserService } from 'src/app/services/user.service';
+import { AddressSuggestionsResponseDto, CreateUserDto } from 'src/app/dtos/user.dto';
+import { clearValidators, isFormError, isFormInvalid, passwordsMatch, setRequired, updateValidity } from 'src/app/utils/form.helper';
 
 @Component({
   selector: 'core-auth-register',
@@ -25,8 +27,10 @@ export class AuthRegisterComponent {
   usStates = US_STATES;
   Eligibility = Eligibility;
   MilitaryBranchAffiliation = MilitaryBranchAffiliation;
+  isFormInvalid = isFormInvalid;
+  isFormError = isFormError;
 
-  suggestions: { displayName: string; latitude: number; longitude: number }[] = [];
+  suggestions: AddressSuggestionsResponseDto[] = [];
   selectedDisplay: string = '';
 
   private destroyed$ = new Subject<void>();
@@ -34,6 +38,7 @@ export class AuthRegisterComponent {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
+    private userService: UserService,
     private router: Router,
     private toastr: ToastrService
   ) {}
@@ -41,7 +46,7 @@ export class AuthRegisterComponent {
   ngOnInit(): void {
     this.form = this.fb.group(
       {
-        // common
+        role: [UserRole.PHOTOGRAPHER, [Validators.required]],
         firstName: ['', [Validators.required]],
         lastName: ['', [Validators.required]],
         email: ['', [Validators.required, Validators.email]],
@@ -49,29 +54,25 @@ export class AuthRegisterComponent {
         passwordConfirm: ['', [Validators.required]],
         phoneNumber: ['', [Validators.required]],
         streetAddress1: ['', [Validators.required]],
-        streetAddress2: [''],
-        city: [''],
-        state: [''],
-        postalCode: [''],
-        referredBy: [''],
+        streetAddress2: [null],
+        city: [null],
+        state: [null],
+        postalCode: [null],
+        referredBy: [null],
         latitude: [null, [Validators.required]],
         longitude: [null, [Validators.required]],
-        // photographer-only
-        website: [''],
-        // veteran-only
-        seekingEmployment: [null],
-        linkedinProfile: [''],
-        eligibility: [null],
-        militaryBranchAffiliation: [null],
-        militaryETSDate: [''],
-        // frontend-only checkbox
-        certified: [null]
+        website: [null, []],
+        seekingEmployment: [null, []],
+        linkedinProfile: [null],
+        eligibility: [null, []],
+        militaryBranchAffiliation: [null, []],
+        militaryETSDate: [null, []],
+        certified: [null, []]
       },
-      { validators: [this.passwordsMatch] }
+      { validators: [passwordsMatch] }
     );
 
-    // initialize validators for default userType
-    this.applyRoleValidators();
+    this.applyDynamicValidators();
   }
 
   ngOnDestroy(): void {
@@ -86,7 +87,7 @@ export class AuthRegisterComponent {
   setUserType(type: 'photographer' | 'veteran') {
     if (this.userType === type) return;
     this.userType = type;
-    this.applyRoleValidators();
+    this.applyDynamicValidators();
 
     Object.keys(this.form.controls).forEach((key) => {
       const control = this.form.get(key);
@@ -98,44 +99,23 @@ export class AuthRegisterComponent {
     });
   }
 
-  private applyRoleValidators() {
-    // clear role-specific validators first
-    this.clearValidators(['website', 'seekingEmployment', 'eligibility', 'militaryBranchAffiliation', 'militaryETSDate', 'certified']);
+  private applyDynamicValidators() {
+    clearValidators(this.form, [
+      'website',
+      'seekingEmployment',
+      'eligibility',
+      'militaryBranchAffiliation',
+      'militaryETSDate',
+      'certified'
+    ]);
 
     if (this.userType === 'photographer') {
-      // photographer: website required
-      this.setRequired(['website']);
-      this.form.get('certified')!.setValue(false);
+      setRequired(this.form, ['website']);
     } else {
-      // veteran: seekingEmployment, eligibility, militaryBranchAffiliation, certified required
-      this.setRequired(['seekingEmployment', 'eligibility', 'militaryBranchAffiliation', 'militaryETSDate', 'certified']);
-      this.form.get('certified')?.setValidators([Validators.requiredTrue]);
+      setRequired(this.form, ['seekingEmployment', 'eligibility', 'militaryBranchAffiliation', 'militaryETSDate', 'certified']);
     }
 
-    // update validity
-    ['website', 'seekingEmployment', 'eligibility', 'militaryBranchAffiliation', 'militaryETSDate', 'certified'].forEach((key) =>
-      this.form.get(key)?.updateValueAndValidity()
-    );
-  }
-
-  private clearValidators(keys: string[]) {
-    keys.forEach((k) => {
-      const c = this.form.get(k);
-      if (c) c.clearValidators();
-    });
-  }
-
-  private setRequired(keys: string[]) {
-    keys.forEach((k) => {
-      const c = this.form.get(k);
-      if (c) c.setValidators([Validators.required]);
-    });
-  }
-
-  private passwordsMatch(group: AbstractControl) {
-    const password = group.get('password')?.value;
-    const passwordConfirm = group.get('passwordConfirm')?.value;
-    return password && passwordConfirm && password === passwordConfirm ? null : { passwordsMismatch: true };
+    updateValidity(this.form, ['website', 'seekingEmployment', 'eligibility', 'militaryBranchAffiliation', 'militaryETSDate', 'certified']);
   }
 
   verifyAddress() {
@@ -155,11 +135,11 @@ export class AuthRegisterComponent {
 
     this.verifying = true;
 
-    this.auth
+    this.userService
       .getAddressSuggestions(addressFields)
       .pipe(takeUntil(this.destroyed$))
       .subscribe({
-        next: (res: { displayName: string; latitude: number; longitude: number }[]) => {
+        next: (res: AddressSuggestionsResponseDto[]) => {
           this.suggestions = res;
           this.selectedDisplay = ''; // Reset selected
           this.form.patchValue({ latitude: null, longitude: null }); // Reset lat/long
@@ -179,10 +159,10 @@ export class AuthRegisterComponent {
 
   selectAddress(event: Event) {
     const target = event.target as HTMLSelectElement;
-    const index = target.value;
-    if (!index) return;
+    const index = parseInt(target.value, 10);
+    if (isNaN(index)) return;
 
-    const selected = this.suggestions[parseInt(index, 10)];
+    const selected = this.suggestions[index];
     this.form.patchValue({
       latitude: selected.latitude,
       longitude: selected.longitude
@@ -192,66 +172,69 @@ export class AuthRegisterComponent {
     this.toastr.info('Please fill out all address fields based on selected address');
   }
 
-  // helpers to show errors in template
-  invalid(name: string) {
-    const c = this.form.get(name);
-    return !!c && c.touched && c.invalid;
-  }
-  error(name: string, key: string) {
-    return this.form.get(name)?.hasError(key);
-  }
-
   submit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.toastr.error('Form is not valid. Please fill out all required fields');
       return;
     }
 
     this.submitting = true;
 
     const role = this.userType === 'photographer' ? UserRole.PHOTOGRAPHER : UserRole.VETERAN;
+    const status = this.userType === 'photographer' ? UserStatus.PENDING : UserStatus.APPROVED;
 
     // map to backend DTO
-    const payload: any = {
+    const payload: CreateUserDto = {
       email: this.f['email'].value,
       password: this.f['password'].value,
       firstName: this.f['firstName'].value,
       lastName: this.f['lastName'].value,
       role,
+      status,
       phoneNumber: this.f['phoneNumber'].value,
       streetAddress1: this.f['streetAddress1'].value,
       streetAddress2: this.f['streetAddress2'].value || undefined,
       city: this.f['city'].value || undefined,
       state: this.f['state'].value || undefined,
       postalCode: this.f['postalCode'].value || undefined,
-      referredBy: this.f['referredBy'].value || undefined,
       latitude: this.f['latitude'].value,
-      longitude: this.f['longitude'].value
+      longitude: this.f['longitude'].value,
+      referredBy: this.f['referredBy'].value || undefined
     };
 
     if (role === UserRole.PHOTOGRAPHER) {
       payload.website = this.f['website'].value;
     } else {
-      payload.seekingEmployment = this.f['seekingEmployment'].value === true || this.f['seekingEmployment'].value === 'true';
+      payload.seekingEmployment = this.f['seekingEmployment'].value;
       payload.linkedinProfile = this.f['linkedinProfile'].value || undefined;
-      payload.eligibility = Number(this.f['eligibility'].value);
-      payload.militaryBranchAffiliation = Number(this.f['militaryBranchAffiliation'].value);
-      payload.militaryETSDate = this.f['militaryETSDate'].value || undefined;
+      payload.eligibility = this.f['eligibility'].value;
+      payload.militaryBranchAffiliation = this.f['militaryBranchAffiliation'].value;
+      payload.militaryETSDate = this.f['militaryETSDate'].value;
     }
 
     this.auth
       .signup(payload)
       .pipe(takeUntil(this.destroyed$))
       .subscribe({
-        next: (res) => {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          this.toastr.success('Signed up successfully!');
-          this.router.navigate(['/dashboard']);
+        next: (user) => {
+          if (user.status === UserStatus.PENDING) {
+            this.auth.logout();
+            this.toastr.error('Your account is still under review.');
+            this.router.navigate(['/login']);
+          } else if (user.status === UserStatus.ONBOARDING) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            this.toastr.success('Signed up successfully!');
+            this.router.navigate(['/onboarding']);
+          } else if (user.status === UserStatus.APPROVED) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            this.toastr.success('Signed up successfully!');
+            this.router.navigate(['/dashboard']);
+          }
         },
         error: (err) => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
           this.toastr.error(err?.error?.message || 'Sign up failed');
-          this.submitting = false;
         },
         complete: () => {
           this.submitting = false;

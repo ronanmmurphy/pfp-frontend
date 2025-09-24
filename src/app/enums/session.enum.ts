@@ -1,7 +1,6 @@
 export enum SessionStatus {
-  REQUESTED = 0,
-  SCHEDULED = 1,
-  RESCHEDULE_REQUESTED = 2,
-  COMPLETED = 3,
-  CANCELED = 4
+  SCHEDULED = 0,
+  RESCHEDULED = 1,
+  COMPLETED = 2,
+  CANCELED = 3
 }

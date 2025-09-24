@@ -1,24 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, catchError, shareReplay, tap, throwError } from 'rxjs';
-import { UserRole } from 'src/app/enums/user.enum';
-
-type Tokens = { accessToken: string; refreshToken: string };
-
-type CurrentUser = {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: UserRole;
-  streetAddress1: string;
-  streetAddress2?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
-  latitude?: number;
-  longitude?: number;
-};
+import { BehaviorSubject, Observable, Subject, catchError, map, of, switchMap, takeUntil, tap, throwError } from 'rxjs';
+import { IUser } from '../types/user.type';
+import { AuthResponseDto, ChangePasswordDto, SignInDto } from '../dtos/auth.dto';
+import { CreateUserDto } from '../dtos/user.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -28,26 +13,80 @@ export class AuthService {
   private refreshKey = 'refreshToken';
 
   // Currrent User
-  currentUser$: Observable<CurrentUser> = this.http.get<CurrentUser>('/auth/me');
+  // currentUser$: Observable<IUser> = this.http.get<IUser>('/auth/me');
+  private currentUserSubject = new BehaviorSubject<IUser | null>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
+  private destroy$ = new Subject<void>();
+  private isInitialized = false;
 
   constructor(private http: HttpClient) {}
 
-  getAddressSuggestions(address: any) {
-    return this.http.post<{ displayName: string; latitude: number; longitude: number }[]>('/auth/address-suggestions', address);
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  me(): Observable<IUser | null> {
+    if (this.isInitialized) {
+      return this.currentUser$.pipe(takeUntil(this.destroy$));
+    }
+
+    const token = localStorage.getItem(this.accessKey);
+    if (!token) {
+      this.isInitialized = true;
+      return of(null);
+    }
+
+    return this.http.get<IUser>('/auth/me').pipe(
+      tap((user) => {
+        this.currentUserSubject.next(user);
+        this.isInitialized = true;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        this.logout();
+        this.isInitialized = true;
+        return of(null);
+      }),
+      takeUntil(this.destroy$)
+    );
+  }
+
+  refreshCurrentUser(): Observable<IUser | null> {
+    return this.http.get<IUser>('/auth/me').pipe(
+      tap((user) => this.currentUserSubject.next(user)),
+      catchError((err) => {
+        this.logout();
+        return of(null);
+      })
+    );
   }
 
   // Sign Up
-  signup(payload: any): Observable<Tokens> {
-    return this.http.post<Tokens>('/auth/signup', payload).pipe(tap((tokens) => this.storeTokens(tokens)));
+  signup(payload: CreateUserDto): Observable<IUser> {
+    return this.http.post<AuthResponseDto>('/auth/signup', payload).pipe(
+      tap((tokens) => this.storeTokens(tokens)),
+      switchMap(() => this.http.get<IUser>('/auth/me')),
+      tap((user) => {
+        this.currentUserSubject.next(user);
+        this.isInitialized = true;
+      })
+    );
   }
 
   // Sign In
-  signin(email: string, password: string): Observable<Tokens> {
-    return this.http.post<Tokens>('/auth/signin', { email, password }).pipe(tap((tokens) => this.storeTokens(tokens)));
+  signin(payload: SignInDto): Observable<IUser> {
+    return this.http.post<AuthResponseDto>('/auth/signin', payload).pipe(
+      tap((tokens) => this.storeTokens(tokens)),
+      switchMap(() => this.http.get<IUser>('/auth/me')),
+      tap((user) => {
+        this.currentUserSubject.next(user);
+        this.isInitialized = true;
+      })
+    );
   }
 
   // Refresh Token
-  refreshToken(): Observable<Tokens> {
+  refreshToken(): Observable<AuthResponseDto> {
     const accessToken = this.getAccessToken();
     const refreshToken = this.getRefreshToken();
 
@@ -55,7 +94,7 @@ export class AuthService {
       return throwError(() => new Error('Missing accessToken or refreshToken'));
     }
 
-    return this.http.post<Tokens>('/auth/refresh', { refreshToken }).pipe(
+    return this.http.post<AuthResponseDto>('/auth/refresh', { refreshToken }).pipe(
       tap((tokens) => this.storeTokens(tokens)),
       catchError((error) => {
         this.logout();
@@ -66,7 +105,14 @@ export class AuthService {
 
   // Sign Out
   logout(): void {
+    this.currentUserSubject.next(null);
     this.clearTokens();
+    this.isInitialized = false;
+  }
+
+  // Change Password
+  changePassword(payload: ChangePasswordDto) {
+    return this.http.patch('/auth/change-password', payload);
   }
 
   // ---- Token Helpers ----
@@ -78,11 +124,18 @@ export class AuthService {
     return localStorage.getItem(this.refreshKey);
   }
 
-  isAuthenticated(): boolean {
-    return !!this.getAccessToken();
+  isAuthenticated(): Observable<boolean> {
+    return this.currentUser$.pipe(
+      map((user) => !!user),
+      takeUntil(this.destroy$)
+    );
   }
 
-  private storeTokens(tokens: Tokens) {
+  getCurrentUser(): IUser | null {
+    return this.currentUserSubject.value;
+  }
+
+  private storeTokens(tokens: AuthResponseDto) {
     localStorage.setItem(this.accessKey, tokens.accessToken);
     localStorage.setItem(this.refreshKey, tokens.refreshToken);
   }

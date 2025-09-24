@@ -50,9 +50,10 @@
                     class="form-control"
                     formControlName="firstName"
                     placeholder="First Name"
-                    [ngClass]="{ 'is-invalid': invalid('firstName') }"
+                    [ngClass]="{ 'is-invalid': isFormInvalid(form, 'firstName') }"
+                    [disabled]="submitting"
                   />
-                  <div class="invalid-feedback" *ngIf="invalid('firstName')">First name is required.</div>
+                  <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'firstName')">First name is required.</div>
                 </div>
               </div>
               <div class="col-md-6">
@@ -67,9 +68,10 @@
                     class="form-control"
                     formControlName="lastName"
                     placeholder="Last Name"
-                    [ngClass]="{ 'is-invalid': invalid('firstName') }"
+                    [ngClass]="{ 'is-invalid': isFormInvalid(form, 'lastName') }"
+                    [disabled]="submitting"
                   />
-                  <div class="invalid-feedback" *ngIf="invalid('lastName')">Last name is required.</div>
+                  <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'lastName')">Last name is required.</div>
                 </div>
               </div>
             </div>
@@ -85,10 +87,11 @@
                 class="form-control"
                 formControlName="email"
                 placeholder="Email Address"
-                [ngClass]="{ 'is-invalid': invalid('email') }"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'email') }"
+                [disabled]="submitting"
               />
-              <div class="invalid-feedback" *ngIf="invalid('email')">
-                {{ error('email', 'email') ? 'Enter a valid email.' : 'Email is required.' }}
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'email')">
+                {{ isFormError(form, 'email', 'email') ? 'Enter a valid email.' : 'Email is required.' }}
               </div>
             </div>
 
@@ -103,10 +106,11 @@
                 class="form-control"
                 formControlName="password"
                 placeholder="Password"
-                [ngClass]="{ 'is-invalid': invalid('password') }"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'password') }"
+                [disabled]="submitting"
               />
-              <div class="invalid-feedback" *ngIf="invalid('password')">
-                {{ error('password', 'minlength') ? 'Min 6 characters.' : 'Password is required.' }}
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'password')">
+                {{ isFormError(form, 'password', 'minlength') ? 'Min 6 characters.' : 'Password is required.' }}
               </div>
             </div>
 
@@ -121,6 +125,7 @@
                 class="form-control"
                 formControlName="passwordConfirm"
                 placeholder="Confirm Password"
+                [disabled]="submitting"
               />
               <small
                 class="text-danger"
@@ -141,9 +146,10 @@
                 class="form-control"
                 formControlName="phoneNumber"
                 placeholder="Phone Number"
-                [ngClass]="{ 'is-invalid': invalid('phoneNumber') }"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'phoneNumber') }"
+                [disabled]="submitting"
               />
-              <div class="invalid-feedback" *ngIf="invalid('phoneNumber')">Phone number is required.</div>
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'phoneNumber')">Phone number is required.</div>
             </div>
 
             <div class="form-group mb-3">
@@ -157,9 +163,10 @@
                 class="form-control"
                 formControlName="streetAddress1"
                 placeholder="Street Address"
-                [ngClass]="{ 'is-invalid': invalid('streetAddress1') }"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'streetAddress1') }"
+                [disabled]="submitting"
               />
-              <div class="invalid-feedback" *ngIf="invalid('streetAddress1')">Street address is required.</div>
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'streetAddress1')">Street address is required.</div>
             </div>
 
             <div class="form-group mb-3">
@@ -170,6 +177,7 @@
                 class="form-control"
                 formControlName="streetAddress2"
                 placeholder="Street Address Line 2"
+                [disabled]="submitting"
               />
             </div>
 
@@ -177,13 +185,13 @@
               <div class="col-md-6">
                 <div class="form-group mb-3">
                   <label class="form-label" for="city">City</label>
-                  <input id="city" type="text" class="form-control" formControlName="city" placeholder="City" />
+                  <input id="city" type="text" class="form-control" formControlName="city" placeholder="City" [disabled]="submitting" />
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group mb-3">
                   <label class="form-label" for="state">State</label>
-                  <select id="state" class="form-select" formControlName="state">
+                  <select id="state" class="form-select" formControlName="state" [disabled]="submitting">
                     <option [ngValue]="''">--</option>
                     <option *ngFor="let state of usStates" [ngValue]="state">{{ state }}</option>
                   </select>
@@ -195,12 +203,26 @@
               <div class="col-md-6">
                 <div class="form-group mb-3">
                   <label class="form-label" for="postalCode">Postal / Zip Code</label>
-                  <input id="postalCode" type="text" class="form-control" formControlName="postalCode" placeholder="Postal / Zip Code" />
+                  <input
+                    id="postalCode"
+                    type="text"
+                    class="form-control"
+                    formControlName="postalCode"
+                    placeholder="Postal / Zip Code"
+                    [disabled]="submitting"
+                  />
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group mb-3">
-                  <button type="button" class="btn btn-outline-primary w-100" (click)="verifyAddress()">Verify Address</button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary w-100"
+                    (click)="verifyAddress()"
+                    [disabled]="submitting || verifying"
+                  >
+                    Verify Address
+                  </button>
                 </div>
               </div>
             </div>
@@ -211,7 +233,7 @@
               </div>
             </div>
 
-            <ng-container *ngIf="!verifying">
+            <ng-container *ngIf="!verifying && suggestions.length > 0">
               <div class="form-group mb-3">
                 <label class="form-label">
                   Select your exact address:
@@ -228,7 +250,50 @@
               <p class="text-muted">Selected Address: {{ selectedDisplay }}</p>
             </ng-container>
 
-            <div class="text-danger" *ngIf="invalid('latitude') && f['streetAddress1'].value">Please verify and select your address.</div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label" for="latitude">
+                    Latitude
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="latitude"
+                    type="number"
+                    class="form-control"
+                    formControlName="latitude"
+                    placeholder="Latitude"
+                    [ngClass]="{ 'is-invalid': isFormInvalid(form, 'latitude') }"
+                    [readonly]="true"
+                    [disabled]="submitting"
+                  />
+                  <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'latitude')">Latitude is required.</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label" for="longitude">
+                    Longitude
+                    <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    id="longitude"
+                    type="number"
+                    class="form-control"
+                    formControlName="longitude"
+                    placeholder="Longitude"
+                    [ngClass]="{ 'is-invalid': isFormInvalid(form, 'longitude') }"
+                    [readonly]="true"
+                    [disabled]="submitting"
+                  />
+                  <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'longitude')">Longitude is required.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="text-danger" *ngIf="isFormInvalid(form, 'latitude') && f['streetAddress1'].value">
+              Please verify and select your address.
+            </div>
 
             <!-- Photographer-Specific -->
             <div class="form-group mb-3" *ngIf="userType === 'photographer'">
@@ -242,9 +307,10 @@
                 class="form-control"
                 formControlName="website"
                 placeholder="Link To Professional Portfolio"
-                [ngClass]="{ 'is-invalid': invalid('website') }"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'website') }"
+                [disabled]="submitting"
               />
-              <div class="invalid-feedback" *ngIf="invalid('website')">Portfolio link is required for photographers.</div>
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'website')">Portfolio link is required for photographers.</div>
             </div>
 
             <!-- Veteran-Specific -->
@@ -255,14 +321,28 @@
                   <span class="text-danger">*</span>
                 </label>
                 <div class="form-check form-check-inline">
-                  <input id="seekYes" class="form-check-input" type="radio" [value]="true" formControlName="seekingEmployment" />
+                  <input
+                    id="seekYes"
+                    class="form-check-input"
+                    type="radio"
+                    [value]="true"
+                    formControlName="seekingEmployment"
+                    [disabled]="submitting"
+                  />
                   <label class="form-check-label" for="seekYes">Yes</label>
                 </div>
                 <div class="form-check form-check-inline">
-                  <input id="seekNo" class="form-check-input" type="radio" [value]="false" formControlName="seekingEmployment" />
+                  <input
+                    id="seekNo"
+                    class="form-check-input"
+                    type="radio"
+                    [value]="false"
+                    formControlName="seekingEmployment"
+                    [disabled]="submitting"
+                  />
                   <label class="form-check-label" for="seekNo">No</label>
                 </div>
-                <div class="invalid-feedback d-block" *ngIf="invalid('seekingEmployment')">Please choose Yes or No.</div>
+                <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'seekingEmployment')">Please choose Yes or No.</div>
               </div>
 
               <div class="form-group mb-3">
@@ -273,6 +353,7 @@
                   class="form-control"
                   formControlName="linkedinProfile"
                   placeholder="LinkedIn Profile"
+                  [disabled]="submitting"
                 />
               </div>
 
@@ -288,6 +369,7 @@
                     type="radio"
                     [value]="Eligibility.TRANSITIONING_SERVICE_MEMBER"
                     formControlName="eligibility"
+                    [disabled]="submitting"
                   />
                   <label class="form-check-label" for="tsm">Transitioning Service Member</label>
                 </div>
@@ -298,6 +380,7 @@
                     type="radio"
                     [value]="Eligibility.GOLD_STAR_FAMILY_MEMBER"
                     formControlName="eligibility"
+                    [disabled]="submitting"
                   />
                   <label class="form-check-label" for="gsfm">Gold Star Family Member</label>
                 </div>
@@ -308,10 +391,11 @@
                     type="radio"
                     [value]="Eligibility.MILITARY_SPOUSE"
                     formControlName="eligibility"
+                    [disabled]="submitting"
                   />
                   <label class="form-check-label" for="spouse">Military Spouse</label>
                 </div>
-                <div class="invalid-feedback d-block" *ngIf="invalid('eligibility')">Please select your eligibility.</div>
+                <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'eligibility')">Please select your eligibility.</div>
               </div>
 
               <div class="form-group mb-3">
@@ -328,6 +412,7 @@
                         type="radio"
                         [value]="MilitaryBranchAffiliation.US_AIR_FORCE"
                         formControlName="militaryBranchAffiliation"
+                        [disabled]="submitting"
                       />
                       <label class="form-check-label" for="airforce">US Air Force</label>
                     </div>
@@ -338,6 +423,7 @@
                         type="radio"
                         [value]="MilitaryBranchAffiliation.US_ARMY"
                         formControlName="militaryBranchAffiliation"
+                        [disabled]="submitting"
                       />
                       <label class="form-check-label" for="army">US Army</label>
                     </div>
@@ -346,8 +432,9 @@
                         id="coastguard"
                         class="form-check-input"
                         type="radio"
-                        [value]="MilitaryBranchAffiliation.US_COST_GUARD"
+                        [value]="MilitaryBranchAffiliation.US_COAST_GUARD"
                         formControlName="militaryBranchAffiliation"
+                        [disabled]="submitting"
                       />
                       <label class="form-check-label" for="coastguard">US Coast Guard</label>
                     </div>
@@ -360,6 +447,7 @@
                         type="radio"
                         [value]="MilitaryBranchAffiliation.US_NAVY"
                         formControlName="militaryBranchAffiliation"
+                        [disabled]="submitting"
                       />
                       <label class="form-check-label" for="navy">US Navy</label>
                     </div>
@@ -370,6 +458,7 @@
                         type="radio"
                         [value]="MilitaryBranchAffiliation.US_MARINE_CORPS"
                         formControlName="militaryBranchAffiliation"
+                        [disabled]="submitting"
                       />
                       <label class="form-check-label" for="marine">US Marine Corps</label>
                     </div>
@@ -380,24 +469,31 @@
                         type="radio"
                         [value]="MilitaryBranchAffiliation.US_SPACE_FORCE"
                         formControlName="militaryBranchAffiliation"
+                        [disabled]="submitting"
                       />
                       <label class="form-check-label" for="spaceforce">US Space Force</label>
                     </div>
                   </div>
-                  <div class="invalid-feedback d-block" *ngIf="invalid('militaryBranchAffiliation')">Please select your branch.</div>
+                  <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'militaryBranchAffiliation')">
+                    Please select your branch.
+                  </div>
                 </div>
               </div>
 
               <div class="form-group mb-3">
-                <label class="form-label" for="militaryETSDate">Military ETS Date</label>
+                <label class="form-label" for="militaryETSDate">
+                  Military ETS Date
+                  <span class="text-danger">*</span>
+                </label>
                 <input
                   id="militaryETSDate"
                   type="date"
                   class="form-control"
                   formControlName="militaryETSDate"
-                  [ngClass]="{ 'is-invalid': invalid('militaryETSDate') }"
+                  [ngClass]="{ 'is-invalid': isFormInvalid(form, 'militaryETSDate') }"
+                  [disabled]="submitting"
                 />
-                <div class="invalid-feedback d-block" *ngIf="invalid('militaryETSDate')">Please select Military ETS Date.</div>
+                <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'militaryETSDate')">Please select Military ETS Date.</div>
               </div>
 
               <div class="form-check mb-3">
@@ -406,14 +502,15 @@
                   type="checkbox"
                   id="certified"
                   formControlName="certified"
-                  [ngClass]="{ 'is-invalid': invalid('certified') }"
+                  [ngClass]="{ 'is-invalid': isFormInvalid(form, 'certified') }"
+                  [disabled]="submitting"
                 />
                 <label class="form-check-label" for="certified">
                   I certify that I am in the transition phase of my honorable military career, a job seeking military spouse, or a Gold Star
                   family member. I am not a gainfully employed veteran.
                   <span class="text-danger">*</span>
                 </label>
-                <div class="invalid-feedback d-block" *ngIf="invalid('certified')">This certification is required.</div>
+                <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'certified')">This certification is required.</div>
               </div>
             </ng-container>
 
@@ -425,6 +522,7 @@
                 class="form-control"
                 formControlName="referredBy"
                 placeholder="Were you referred by anyone?"
+                [disabled]="submitting"
               />
             </div>
 
@@ -447,7 +545,7 @@
         <div class="col my-1">
           <p class="m-0">
             Copyright ©
-            <a href="javascript:">Potraits for Patriots</a>
+            <a href="javascript:">Portraits for Patriots</a>
           </p>
         </div>
         <div class="col-auto my-1">
