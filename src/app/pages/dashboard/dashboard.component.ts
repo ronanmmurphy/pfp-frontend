@@ -83,7 +83,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const userStats = stats as UserStats;
           this.mySessionsCompleted = userStats.sessionsCompleted;
           this.mySessionsCanceled = userStats.sessionsCanceled;
-          this.sessionsActive = userStats.sessionsActive;
+          this.mySessionsActive = userStats.sessionsActive;
         }
 
         this.loading = false;
