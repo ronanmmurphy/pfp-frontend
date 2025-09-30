@@ -114,17 +114,39 @@
         <div class="row">
           <div class="col-md-6">
             <div class="form-group mb-3">
-              <label class="form-label" for="city">City</label>
-              <input id="city" type="text" class="form-control" formControlName="city" placeholder="City" [disabled]="submitting" />
+              <label class="form-label" for="city">
+                City
+                <span class="text-danger">*</span>
+              </label>
+              <input
+                id="city"
+                type="text"
+                class="form-control"
+                formControlName="city"
+                placeholder="City"
+                [ngClass]="{ 'is-invalid': isFormInvalid(userForm, 'city') }"
+                [disabled]="submitting"
+              />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(userForm, 'city')">City is required.</div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group mb-3">
-              <label class="form-label" for="state">State</label>
-              <select id="state" class="form-control" formControlName="state" [disabled]="submitting">
+              <label class="form-label" for="state">
+                State
+                <span class="text-danger">*</span>
+              </label>
+              <select
+                id="state"
+                class="form-control"
+                formControlName="state"
+                [ngClass]="{ 'is-invalid': isFormInvalid(userForm, 'state') }"
+                [disabled]="submitting"
+              >
                 <option value="">--</option>
                 <option *ngFor="let state of usStates" [value]="state">{{ state }}</option>
               </select>
+              <div class="invalid-feedback" *ngIf="isFormInvalid(userForm, 'state')">State is required.</div>
             </div>
           </div>
         </div>
@@ -132,15 +154,20 @@
         <div class="row align-items-end">
           <div class="col-md-6">
             <div class="form-group mb-3">
-              <label class="form-label" for="postalCode">Postal / Zip Code</label>
+              <label class="form-label" for="postalCode">
+                Postal / Zip Code
+                <span class="text-danger">*</span>
+              </label>
               <input
                 id="postalCode"
                 type="text"
                 class="form-control"
                 formControlName="postalCode"
                 placeholder="Postal / Zip Code"
+                [ngClass]="{ 'is-invalid': isFormInvalid(userForm, 'postalCode') }"
                 [disabled]="submitting"
               />
+              <div class="invalid-feedback" *ngIf="isFormInvalid(userForm, 'postalCode')">Postal Code is required.</div>
             </div>
           </div>
           <div class="col-md-6">

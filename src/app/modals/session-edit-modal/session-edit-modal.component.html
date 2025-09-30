@@ -44,7 +44,6 @@
       [disabled]="isVeteran || submitting"
     >
       <option [ngValue]="SessionStatus.SCHEDULED">Scheduled</option>
-      <option [ngValue]="SessionStatus.RESCHEDULED">Rescheduled</option>
       <option [ngValue]="SessionStatus.COMPLETED">Completed</option>
       <option [ngValue]="SessionStatus.CANCELED">Canceled</option>
     </select>
@@ -67,17 +66,6 @@
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'date')">Session date is required.</div>
   </div>
 
-  <div class="form-group mb-3">
-    <label class="form-label" for="expirationDate">Expiration Date</label>
-    <input
-      id="expirationDate"
-      type="datetime-local"
-      class="form-control"
-      formControlName="expirationDate"
-      [disabled]="isVeteran || submitting"
-    />
-  </div>
-
   <div class="form-group mb-3" *ngIf="!isAdmin">
     <label class="form-label">Photographer</label>
     <div class="card p-2">
@@ -88,10 +76,10 @@
         {{
           getLocationText(
             session?.photographer.streetAddress1,
-            session?.photographer.streetAddress2,
             session?.photographer.city,
             session?.photographer.state,
-            session?.photographer.postalCode
+            session?.photographer.postalCode,
+            session?.photographer?.streetAddress2
           )
         }}
       </p>
@@ -125,7 +113,92 @@
   </div>
 
   <div class="form-group mb-3" *ngIf="showFeedbackFields">
-    <label class="form-label" for="photographerFeedback">Photographer Feedback</label>
+    <label class="form-label">
+      Session Outcome
+      <span class="text-danger">*</span>
+    </label>
+    <div class="form-check">
+      <input
+        id="phbp"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.PHOTOS_HAVE_BEEN_PROVIDED_TO_THE_PATRIOT"
+        formControlName="outcomePhotographer"
+        [disabled]="isVeteran || submitting"
+      />
+      <label class="form-check-label" for="phbp">Photos have been provided to the Patriot</label>
+    </div>
+    <div class="form-check">
+      <input
+        id="phnp"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.PHOTOGRAPHER_HAS_NOT_PROVIDED_PHOTOS_YET"
+        formControlName="outcomePhotographer"
+        [disabled]="isVeteran || submitting"
+      />
+      <label class="form-check-label" for="phnp">Photographer has not provided photos yet</label>
+    </div>
+    <div class="form-check">
+      <input
+        id="pdns"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.PATRIOT_DID_NOT_SHOW_UP_FOR_APPOINTMENT"
+        formControlName="outcomePhotographer"
+        [disabled]="isVeteran || submitting"
+      />
+      <label class="form-check-label" for="pdns">Patriot did not show up for appointment</label>
+    </div>
+    <div class="form-check">
+      <input
+        id="ncut"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.NO_COMMUNICATION_UNABLE_TO_SCHEDULE"
+        formControlName="outcomePhotographer"
+        [disabled]="isVeteran || submitting"
+      />
+      <label class="form-check-label" for="ncut">No communication, unable to schedule</label>
+    </div>
+    <div class="form-check">
+      <input
+        id="other"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.OTHER"
+        formControlName="outcomePhotographer"
+        [disabled]="isVeteran || submitting"
+      />
+      <label class="form-check-label" for="other">Other</label>
+    </div>
+    <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'outcomePhotographer')">Please select session outcome.</div>
+  </div>
+
+  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+    <label class="form-label">
+      How would you rate this session?
+      <span class="text-danger">*</span>
+    </label>
+    <select
+      id="ratePhotographer"
+      class="form-control"
+      formControlName="ratePhotographer"
+      [ngClass]="{ 'is-invalid': isFormInvalid(form, 'ratePhotographer') }"
+      [disabled]="isVeteran || submitting"
+    >
+      <option [ngValue]="null">--</option>
+      <option *ngFor="let num of [].constructor(10); let i = index" [ngValue]="i + 1">
+        {{ i + 1 }}
+      </option>
+    </select>
+    <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'ratePhotographer')">Rate is required.</div>
+  </div>
+
+  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+    <label class="form-label" for="photographerFeedback">
+      (Optional) Would you like to provide any additional comments about the session?
+    </label>
     <textarea
       id="photographerFeedback"
       class="form-control"
@@ -136,12 +209,12 @@
   </div>
 
   <div class="form-group mb-3">
-    <label class="form-label">Veteran</label>
+    <label class="form-label">Client</label>
     <ng-select
       [items]="veteranList"
       bindLabel="fullName"
       bindValue="id"
-      placeholder="Search Veteran..."
+      placeholder="Search Client..."
       formControlName="veteranId"
       [searchable]="true"
       [searchFn]="searchUser"
@@ -158,16 +231,99 @@
         <small>{{ item.location }}</small>
       </ng-template>
     </ng-select>
-    <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'veteranId')">Veteran is required.</div>
+    <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'veteranId')">Client is required.</div>
   </div>
 
   <div class="form-group mb-3" *ngIf="showFeedbackFields">
-    <label class="form-label" for="veteranFeedback">Veteran Feedback</label>
+    <label class="form-label">
+      Session Outcome
+      <span class="text-danger">*</span>
+    </label>
+    <div class="form-check">
+      <input
+        id="phbp"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.PHOTOS_HAVE_BEEN_PROVIDED_TO_THE_PATRIOT"
+        formControlName="outcomeVeteran"
+        [disabled]="isPhotographer || submitting"
+      />
+      <label class="form-check-label" for="phbp">Photos have been provided to the Patriot</label>
+    </div>
+    <div class="form-check">
+      <input
+        id="phnp"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.PHOTOGRAPHER_HAS_NOT_PROVIDED_PHOTOS_YET"
+        formControlName="outcomeVeteran"
+        [disabled]="isPhotographer || submitting"
+      />
+      <label class="form-check-label" for="phnp">Photographer has not provided photos yet</label>
+    </div>
+    <div class="form-check">
+      <input
+        id="pdns"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.PATRIOT_DID_NOT_SHOW_UP_FOR_APPOINTMENT"
+        formControlName="outcomeVeteran"
+        [disabled]="isPhotographer || submitting"
+      />
+      <label class="form-check-label" for="pdns">Patriot did not show up for appointment</label>
+    </div>
+    <div class="form-check">
+      <input
+        id="ncut"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.NO_COMMUNICATION_UNABLE_TO_SCHEDULE"
+        formControlName="outcomeVeteran"
+        [disabled]="isPhotographer || submitting"
+      />
+      <label class="form-check-label" for="ncut">No communication, unable to schedule</label>
+    </div>
+    <div class="form-check">
+      <input
+        id="other"
+        class="form-check-input"
+        type="radio"
+        [value]="SessionOutcome.OTHER"
+        formControlName="outcomeVeteran"
+        [disabled]="isPhotographer || submitting"
+      />
+      <label class="form-check-label" for="other">Other</label>
+    </div>
+    <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'outcomeVeteran')">Please select session outcome.</div>
+  </div>
+
+  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+    <label class="form-label">
+      How would you rate this session?
+      <span class="text-danger">*</span>
+    </label>
+    <select
+      id="rateVeteran"
+      class="form-control"
+      formControlName="rateVeteran"
+      [ngClass]="{ 'is-invalid': isFormInvalid(form, 'rateVeteran') }"
+      [disabled]="isPhotographer || submitting"
+    >
+      <option [ngValue]="null">--</option>
+      <option *ngFor="let num of [].constructor(10); let i = index" [ngValue]="i + 1">
+        {{ i + 1 }}
+      </option>
+    </select>
+    <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'rateVeteran')">Rate is required.</div>
+  </div>
+
+  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+    <label class="form-label" for="veteranFeedback">(Optional) Would you like to provide any additional comments about the session?</label>
     <textarea
       id="veteranFeedback"
       class="form-control"
       formControlName="veteranFeedback"
-      placeholder="Veteran Feedback"
+      placeholder="Client Feedback"
       [disabled]="isPhotographer || submitting"
     ></textarea>
   </div>

@@ -2,14 +2,13 @@
   <!-- ADMIN VIEW -->
   <ng-container *ngIf="role === UserRole.ADMIN; else nonAdmin">
     <div class="row">
-      <div class="col-md-6"><app-stats-card title="Veterans" [value]="veterans"></app-stats-card></div>
+      <div class="col-md-6"><app-stats-card title="Clients" [value]="veterans"></app-stats-card></div>
       <div class="col-md-6">
         <div class="card shadow-sm mb-3">
           <div class="card-body">
             <div class="text-muted mb-2">Photographers</div>
             <div class="fs-3 fw-bold">
-              {{ pendingPhotographers | number }}
-              <small>Pending,</small>
+              {{ photographers | number }} /
               {{ onboardingPhotographers | number }}
               <small>Onboarding,</small>
               {{ approvedPhotographers | number }}

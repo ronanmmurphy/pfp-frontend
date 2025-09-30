@@ -3,11 +3,10 @@ import { Eligibility, MilitaryBranchAffiliation, UserRole, UserStatus } from '..
 export const UserRoleLabel: Record<UserRole, string> = {
   [UserRole.ADMIN]: 'Admin',
   [UserRole.PHOTOGRAPHER]: 'Photographer',
-  [UserRole.VETERAN]: 'Veteran'
+  [UserRole.VETERAN]: 'Client'
 };
 
 export const UserStatusLabel: Record<UserStatus, string> = {
-  [UserStatus.PENDING]: 'Pending',
   [UserStatus.ONBOARDING]: 'Onboarding',
   [UserStatus.APPROVED]: 'Approved',
   [UserStatus.DENIED]: 'Denied'
@@ -28,7 +27,7 @@ export const MilitaryBranchAffiliationLabel: Record<MilitaryBranchAffiliation, s
   [MilitaryBranchAffiliation.US_SPACE_FORCE]: 'US Space Force'
 };
 
-export function getFullName(firstName: string, lastName?: string) {
+export function getFullName(firstName: string, lastName: string) {
   return firstName + ' ' + lastName;
 }
 
@@ -40,9 +39,9 @@ export function getUserStatusText(status: UserStatus) {
   return UserStatusLabel[status] ?? 'Unknown';
 }
 
-export function getLocationText(streetAddress1: string, streetAddress2?: string, city?: string, state?: string, postalCode?: string) {
-  const parts = [streetAddress1, streetAddress2, city, state, postalCode].filter(Boolean);
-  return parts.join(', ');
+export function getLocationText(streetAddress1: string, city: string, state: string, postalCode: string, streetAddress2?: string) {
+  const streetAddress = streetAddress2 ? streetAddress1 + ', ' + streetAddress2 : streetAddress1;
+  return streetAddress + ', ' + city + ', ' + state + ', ' + postalCode;
 }
 
 export function getSeekingEmploymentText(seekingEmployment: boolean | undefined | null) {

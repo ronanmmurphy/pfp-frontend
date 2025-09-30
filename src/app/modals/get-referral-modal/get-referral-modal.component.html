@@ -10,7 +10,7 @@
   </p>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <p *ngIf="!useCustomLocation">
-      {{ getLocationText(user?.streetAddress1, user?.streetAddress2, user?.city, user?.state, user?.postalCode) }}
+      {{ getLocationText(user.streetAddress1, user.city, user.state, user.postalCode, user?.streetAddress2) }}
     </p>
     <div *ngIf="useCustomLocation" style="flex: 1 1 auto">
       <ng-select
@@ -73,30 +73,15 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Contact</th>
+          <th>Photographer</th>
           <th>Location</th>
           <th>Distance (miles)</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let photographer of photographers">
-          <td>{{ getFullName(photographer.firstName, photographer.lastName) }}</td>
-          <td>
-            <p>{{ photographer.email || 'No Email' }}</p>
-            <p>{{ photographer.phoneNumber || 'No Phone' }}</p>
-          </td>
-          <td>
-            {{
-              getLocationText(
-                photographer.streetAddress1,
-                photographer?.streetAddress2,
-                photographer?.city,
-                photographer?.state,
-                photographer?.postalCode
-              )
-            }}
-          </td>
+        <tr *ngFor="let photographer of photographers" (click)="getReferral(photographer)">
+          <td>Photographer {{ photographer.id }}</td>
+          <td>{{ photographer.city }}, {{ photographer.state }}, {{ photographer.postalCode }}</td>
           <td>{{ photographer.distance.toFixed(2) }}</td>
         </tr>
       </tbody>

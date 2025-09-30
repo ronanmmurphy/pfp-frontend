@@ -26,7 +26,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // admin totals
   veterans = 0;
   photographers = 0;
-  pendingPhotographers = 0;
   onboardingPhotographers = 0;
   approvedPhotographers = 0;
   deniedPhotographers = 0;
@@ -74,7 +73,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const adminStats = stats as AdminStats;
           this.veterans = adminStats.veterans;
           this.photographers = adminStats.photographers;
-          this.pendingPhotographers = adminStats.pendingPhotographers;
           this.onboardingPhotographers = adminStats.onboardingPhotographers;
           this.approvedPhotographers = adminStats.approvedPhotographers;
           this.deniedPhotographers = adminStats.deniedPhotographers;

@@ -6,7 +6,6 @@ import { SessionStatus } from '../enums/session.enum';
 export interface AdminStats {
   veterans: number;
   photographers: number;
-  pendingPhotographers: number;
   onboardingPhotographers: number;
   approvedPhotographers: number;
   deniedPhotographers: number;

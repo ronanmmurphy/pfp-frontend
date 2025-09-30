@@ -5,10 +5,9 @@ export enum UserRole {
 }
 
 export enum UserStatus {
-  PENDING = 0,
-  ONBOARDING = 1,
-  APPROVED = 2,
-  DENIED = 3
+  ONBOARDING = 0,
+  APPROVED = 1,
+  DENIED = 2
 }
 
 export enum Eligibility {

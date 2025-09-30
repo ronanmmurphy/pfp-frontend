@@ -30,13 +30,6 @@ export class AuthGuard implements CanActivate {
   }
 
   private checkUserStatus(user: IUser, state: RouterStateSnapshot): boolean {
-    if (user.status === UserStatus.PENDING) {
-      this.authService.logout();
-      this.toastr.error('Your account is still under review.');
-      this.router.navigate(['/login']);
-      return false;
-    }
-
     if (user.status === UserStatus.ONBOARDING && state.url !== '/onboarding') {
       this.router.navigate(['/onboarding']);
       return false;

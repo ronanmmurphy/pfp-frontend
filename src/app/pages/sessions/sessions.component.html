@@ -33,7 +33,7 @@
           <input
             type="text"
             class="form-control form-control-sm"
-            placeholder="Search by photographer or veteran"
+            placeholder="Search by photographer or client"
             [formControl]="form.controls.search"
           />
         </div>
@@ -43,7 +43,6 @@
           <select class="form-control form-control-sm" [formControl]="form.controls.status">
             <option value="null">All</option>
             <option [ngValue]="SessionStatus.SCHEDULED">Scheduled</option>
-            <option [ngValue]="SessionStatus.RESCHEDULED">Rescheduled</option>
             <option [ngValue]="SessionStatus.COMPLETED">Completed</option>
             <option [ngValue]="SessionStatus.CANCELED">Canceled</option>
           </select>
@@ -98,10 +97,9 @@
               <th *ngIf="currentUser?.role !== UserRole.PHOTOGRAPHER">Photographer</th>
               <th *ngIf="currentUser?.role === UserRole.VETERAN">Contact</th>
               <th *ngIf="currentUser?.role === UserRole.VETERAN">Location</th>
-              <th *ngIf="currentUser?.role !== UserRole.VETERAN">Veteran</th>
+              <th *ngIf="currentUser?.role !== UserRole.VETERAN">Client</th>
               <th *ngIf="currentUser?.role === UserRole.PHOTOGRAPHER">Contact</th>
               <th *ngIf="currentUser?.role === UserRole.PHOTOGRAPHER">Location</th>
-              <th>Expiration</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -126,10 +124,10 @@
                 {{
                   getLocationText(
                     s.photographer.streetAddress1,
-                    s.photographer?.streetAddress2,
-                    s.photographer?.city,
-                    s.photographer?.state,
-                    s.photographer?.postalCode
+                    s.photographer.city,
+                    s.photographer.state,
+                    s.photographer.postalCode,
+                    s.photographer?.streetAddress2
                   )
                 }}
               </td>
@@ -142,20 +140,19 @@
                 {{
                   getLocationText(
                     s.veteran.streetAddress1,
-                    s.veteran?.streetAddress2,
-                    s.veteran?.city,
-                    s.veteran?.state,
-                    s.veteran?.postalCode
+                    s.veteran.city,
+                    s.veteran.state,
+                    s.veteran.postalCode,
+                    s.veteran?.streetAddress2
                   )
                 }}
               </td>
-              <td>{{ s.expirationDate | date: 'medium' }}</td>
               <td>
                 <div ngbDropdown class="d-inline-block" container="body">
                   <button class="btn btn-outline-primary btn-sm" ngbDropdownToggle [disabled]="loading">Actions</button>
                   <div ngbDropdownMenu>
                     <button ngbDropdownItem (click)="editSession(s)">{{ currentUser?.role === UserRole.VETERAN ? 'View' : 'Edit' }}</button>
-                    <button
+                    <!-- <button
                       ngbDropdownItem
                       (click)="openRescheduleModal(s)"
                       *ngIf="
@@ -184,7 +181,7 @@
                       "
                     >
                       Cancel
-                    </button>
+                    </button> -->
                   </div>
                 </div>
               </td>

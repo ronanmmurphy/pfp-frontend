@@ -136,7 +136,10 @@ export class OnboardingComponent {
     Object.keys(this.form.value).forEach((key) => {
       if (key !== 'studioSpaceImages' && key !== 'proofOfInsuranceImages') {
         const value = this.form.value[key];
-        if (value !== undefined && value !== null) {
+        if (value === undefined || value === null) return;
+        if (typeof value === 'boolean') {
+          formData.append(key, value ? 'true' : '');
+        } else {
           formData.append(key, value);
         }
       }

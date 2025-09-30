@@ -9,6 +9,8 @@ import { getFullName, getLocationText } from 'src/app/utils/user.helper';
 import { INearbyPhotographer, IUser } from 'src/app/types/user.type';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Subject, debounceTime, distinctUntilChanged, of, switchMap } from 'rxjs';
+import { ReferralService } from 'src/app/services/referral.service';
+import { IReferral } from 'src/app/types/referral.type';
 
 @Component({
   selector: 'app-get-referral-modal',
@@ -57,6 +59,7 @@ export class GetReferralModalComponent implements OnInit, AfterViewInit, OnDestr
   constructor(
     public modal: NgbActiveModal,
     private userService: UserService,
+    private referralService: ReferralService,
     private toastr: ToastrService
   ) {}
 
@@ -155,8 +158,8 @@ export class GetReferralModalComponent implements OnInit, AfterViewInit, OnDestr
     });
 
     // Add veteran's marker (use default if location not set)
-    const veteranLat = this.user?.latitude || 32.7767;
-    const veteranLon = this.user?.longitude || -96.797;
+    const veteranLat = this.latitude || 32.7767;
+    const veteranLon = this.longitude || -96.797;
     L.marker([veteranLat, veteranLon], { icon: this.redIcon }).addTo(this.map).bindPopup('Your Location');
 
     // Add photographers' markers
@@ -164,10 +167,8 @@ export class GetReferralModalComponent implements OnInit, AfterViewInit, OnDestr
       L.marker([p.latitude, p.longitude], { icon: this.blueIcon })
         .addTo(this.map)
         .bindPopup(
-          `<strong>${getFullName(p.firstName, p.lastName)}</strong><br/>
-          ${p.email || 'No Email'}<br/>
-          ${p.phoneNumber || 'No Phone'}<br/>
-          ${getLocationText(p.streetAddress1, p?.streetAddress2, p?.city, p?.state, p?.postalCode)}<br/>
+          `<strong>Photographer ${p.id}</strong><br/>
+          ${p.city}, ${p.state}, ${p.postalCode}<br/>
           Distance: ${p.distance.toFixed(2)} miles`
         );
     });
@@ -178,6 +179,15 @@ export class GetReferralModalComponent implements OnInit, AfterViewInit, OnDestr
       bounds.extend([p.latitude, p.longitude]);
     });
     this.map.fitBounds(bounds, { padding: [50, 50] });
+
+    // Disable map interactions after markers are placed
+    this.map.dragging.disable();
+    this.map.scrollWheelZoom.disable();
+    this.map.doubleClickZoom.disable();
+    this.map.boxZoom.disable();
+    this.map.keyboard.disable();
+    if (this.map.touchZoom) this.map.touchZoom.disable(); // Optional for touch devices
+    this.map.removeControl(this.map.zoomControl); // Remove zoom control buttons
   }
 
   close() {
@@ -205,5 +215,26 @@ export class GetReferralModalComponent implements OnInit, AfterViewInit, OnDestr
     }
 
     return radius;
+  }
+
+  getReferral(photographer: INearbyPhotographer) {
+    if (confirm(`Are you sure you want to connect with Photographer ${photographer.id}?`)) {
+      this.loading = true;
+      this.referralService
+        .createReferral({
+          photographerId: photographer.id,
+          veteranId: this.user.id
+        })
+        .subscribe({
+          next: (referral: IReferral) => {
+            this.loading = false;
+            this.toastr.success("Success! You will get an email with the photographer's details and next steps to schedule a session");
+          },
+          error: (err: any) => {
+            this.toastr.error(err?.error?.message || 'Failed to get a referral.');
+            this.loading = false;
+          }
+        });
+    }
   }
 }

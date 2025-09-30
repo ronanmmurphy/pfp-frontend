@@ -13,14 +13,13 @@
             <option [ngValue]="null">All</option>
             <option [ngValue]="UserRole.ADMIN">Admin</option>
             <option [ngValue]="UserRole.PHOTOGRAPHER">Photographer</option>
-            <option [ngValue]="UserRole.VETERAN">Veteran</option>
+            <option [ngValue]="UserRole.VETERAN">Client</option>
           </select>
         </div>
         <div class="col-md-3">
           <label class="form-label">Status</label>
           <select class="form-control form-control-sm" [formControl]="form.controls.status">
             <option [ngValue]="null">All</option>
-            <option [ngValue]="UserStatus.PENDING">Pending</option>
             <option [ngValue]="UserStatus.ONBOARDING">Onboarding</option>
             <option [ngValue]="UserStatus.APPROVED">Approved</option>
             <option [ngValue]="UserStatus.DENIED">Denied</option>
@@ -73,9 +72,8 @@
                 <span
                   class="badge"
                   [ngClass]="{
-                    'bg-warning': user.status === UserStatus.PENDING,
-                    'bg-info': user.status === UserStatus.ONBOARDING,
-                    'bg-primary': user.status === UserStatus.APPROVED,
+                    'bg-warning': user.status === UserStatus.ONBOARDING,
+                    'bg-info': user.status === UserStatus.APPROVED,
                     'bg-danger': user.status === UserStatus.DENIED
                   }"
                 >
@@ -83,7 +81,7 @@
                 </span>
               </td>
               <td>{{ user.phoneNumber }}</td>
-              <td>{{ getLocationText(user.streetAddress1, user.streetAddress2, user.city, user.state, user.postalCode) }}</td>
+              <td>{{ getLocationText(user.streetAddress1, user.city, user.state, user.postalCode, user?.streetAddress2) }}</td>
               <td>
                 <span
                   class="badge"

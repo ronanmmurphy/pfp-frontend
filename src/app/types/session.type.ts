@@ -1,4 +1,4 @@
-import { SessionStatus } from '../enums/session.enum';
+import { SessionOutcome, SessionStatus } from '../enums/session.enum';
 
 export interface ISession {
   id: number;
@@ -6,8 +6,11 @@ export interface ISession {
   note?: string | null;
   status: SessionStatus;
   date: string;
-  expirationDate?: string | null;
+  outcomePhotographer?: SessionOutcome | null;
+  ratePhotographer?: number | null;
   photographerFeedback?: string | null;
+  outcomeVeteran?: SessionOutcome | null;
+  rateVeteran?: number | null;
   veteranFeedback?: string | null;
   photographer: {
     id: number;
@@ -17,9 +20,9 @@ export interface ISession {
     phoneNumber: string;
     streetAddress1: string;
     streetAddress2?: string | null;
-    city?: string | null;
-    state?: string | null;
-    postalCode?: string | null;
+    city: string;
+    state: string;
+    postalCode: string;
   } | null;
   veteran: {
     id: number;
@@ -29,8 +32,8 @@ export interface ISession {
     phoneNumber: string;
     streetAddress1: string;
     streetAddress2?: string | null;
-    city?: string | null;
-    state?: string | null;
-    postalCode?: string | null;
+    city: string;
+    state: string;
+    postalCode: string;
   } | null;
 }

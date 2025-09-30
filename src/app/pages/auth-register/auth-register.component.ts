@@ -55,9 +55,9 @@ export class AuthRegisterComponent {
         phoneNumber: ['', [Validators.required]],
         streetAddress1: ['', [Validators.required]],
         streetAddress2: [null],
-        city: [null],
-        state: [null],
-        postalCode: [null],
+        city: ['', Validators.required],
+        state: ['', Validators.required],
+        postalCode: ['', Validators.required],
         referredBy: [null],
         latitude: [null, [Validators.required]],
         longitude: [null, [Validators.required]],
@@ -174,6 +174,7 @@ export class AuthRegisterComponent {
 
   submit() {
     if (this.form.invalid) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.form.markAllAsTouched();
       this.toastr.error('Form is not valid. Please fill out all required fields');
       return;
@@ -182,7 +183,7 @@ export class AuthRegisterComponent {
     this.submitting = true;
 
     const role = this.userType === 'photographer' ? UserRole.PHOTOGRAPHER : UserRole.VETERAN;
-    const status = this.userType === 'photographer' ? UserStatus.PENDING : UserStatus.APPROVED;
+    const status = this.userType === 'photographer' ? UserStatus.ONBOARDING : UserStatus.APPROVED;
 
     // map to backend DTO
     const payload: CreateUserDto = {
@@ -195,8 +196,8 @@ export class AuthRegisterComponent {
       phoneNumber: this.f['phoneNumber'].value,
       streetAddress1: this.f['streetAddress1'].value,
       streetAddress2: this.f['streetAddress2'].value || undefined,
-      city: this.f['city'].value || undefined,
-      state: this.f['state'].value || undefined,
+      city: this.f['city'].value,
+      state: this.f['state'].value,
       postalCode: this.f['postalCode'].value || undefined,
       latitude: this.f['latitude'].value,
       longitude: this.f['longitude'].value,
@@ -218,11 +219,7 @@ export class AuthRegisterComponent {
       .pipe(takeUntil(this.destroyed$))
       .subscribe({
         next: (user) => {
-          if (user.status === UserStatus.PENDING) {
-            this.auth.logout();
-            this.toastr.error('Your account is still under review.');
-            this.router.navigate(['/login']);
-          } else if (user.status === UserStatus.ONBOARDING) {
+          if (user.status === UserStatus.ONBOARDING) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             this.toastr.success('Signed up successfully!');
             this.router.navigate(['/onboarding']);

@@ -32,9 +32,9 @@ export interface CreateUserDto {
   phoneNumber: string;
   streetAddress1: string;
   streetAddress2?: string;
-  city?: string;
-  state?: string;
-  postalCode?: string;
+  city: string;
+  state: string;
+  postalCode: string;
   latitude: number;
   longitude: number;
   referredBy?: string;

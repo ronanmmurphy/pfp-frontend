@@ -139,9 +139,12 @@ export class UsersComponent implements OnInit, OnDestroy {
       firstName: '',
       lastName: '',
       role: UserRole.PHOTOGRAPHER,
-      status: UserStatus.PENDING,
+      status: UserStatus.ONBOARDING,
       phoneNumber: '',
       streetAddress1: '',
+      city: '',
+      state: '',
+      postalCode: '',
       latitude: null,
       longitude: null
     };

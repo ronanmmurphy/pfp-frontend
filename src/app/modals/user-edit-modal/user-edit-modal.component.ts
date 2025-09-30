@@ -24,9 +24,12 @@ export class UserEditModalComponent {
     firstName: '',
     lastName: '',
     role: UserRole.PHOTOGRAPHER,
-    status: UserStatus.PENDING,
+    status: UserStatus.ONBOARDING,
     phoneNumber: '',
     streetAddress1: '',
+    city: '',
+    state: '',
+    postalCode: '',
     latitude: null,
     longitude: null
   };
@@ -64,7 +67,7 @@ export class UserEditModalComponent {
     this.form = this.fb.group(
       {
         role: [UserRole.PHOTOGRAPHER, [Validators.required]],
-        status: [UserStatus.PENDING, [Validators.required]],
+        status: [UserStatus.ONBOARDING, [Validators.required]],
         firstName: ['', [Validators.required]],
         lastName: ['', [Validators.required]],
         email: ['', [Validators.required, Validators.email]],
@@ -73,9 +76,9 @@ export class UserEditModalComponent {
         phoneNumber: ['', [Validators.required]],
         streetAddress1: ['', [Validators.required]],
         streetAddress2: [null],
-        city: [null],
-        state: [null],
-        postalCode: [null],
+        city: ['', Validators.required],
+        state: ['', Validators.required],
+        postalCode: ['', Validators.required],
         latitude: [null, [Validators.required]],
         longitude: [null, [Validators.required]],
         referredBy: [null],
@@ -137,7 +140,7 @@ export class UserEditModalComponent {
             control.updateValueAndValidity();
           }
         });
-        const status = role === UserRole.PHOTOGRAPHER ? UserStatus.PENDING : UserStatus.APPROVED;
+        const status = role === UserRole.PHOTOGRAPHER ? UserStatus.ONBOARDING : UserStatus.APPROVED;
         this.form.get('status')?.setValue(status);
       });
 
@@ -366,6 +369,7 @@ export class UserEditModalComponent {
 
   saveUser(): void {
     if (this.form.invalid) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.form.markAllAsTouched();
       this.toastr.error('Form is not valid. Please fill out all required fields');
       return;
@@ -382,7 +386,9 @@ export class UserEditModalComponent {
 
       if (value === undefined || value === null) return;
 
-      if (!skipFields.includes(key)) {
+      if (typeof value === 'boolean') {
+        formData.append(key, value ? 'true' : '');
+      } else if (!skipFields.includes(key)) {
         formData.append(key, value);
       }
     });
@@ -401,11 +407,13 @@ export class UserEditModalComponent {
 
     request.pipe(takeUntil(this.destroyed$)).subscribe({
       next: () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         this.toastr.success(this.isEdit ? 'User updated successfully.' : 'User created successfully.');
         this.submitting = false;
         this.save.emit();
       },
       error: (err) => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         this.toastr.error(err?.error?.message || (this.isEdit ? 'Failed to update user.' : 'Failed to create user.'));
         this.submitting = false;
       }

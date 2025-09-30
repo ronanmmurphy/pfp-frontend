@@ -45,11 +45,7 @@ export class AuthLoginComponent {
       .subscribe({
         next: (user) => {
           this.loading = false;
-          if (user.status === UserStatus.PENDING) {
-            this.auth.logout();
-            this.toastr.error('Your account is still under review.');
-            this.router.navigate(['/login']);
-          } else if (user.status === UserStatus.ONBOARDING) {
+          if (user.status === UserStatus.ONBOARDING) {
             this.toastr.success('Logged in successfully!');
             this.router.navigate(['/onboarding']);
           } else if (user.status === UserStatus.APPROVED) {

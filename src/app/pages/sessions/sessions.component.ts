@@ -151,7 +151,6 @@ export class SessionsComponent implements OnInit, OnDestroy {
     this.selectedView = view;
     this.page = 1;
     this.resetFilters();
-    this.load().subscribe();
   }
 
   resetFilters() {
@@ -190,9 +189,9 @@ export class SessionsComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.isEdit = false;
     modalRef.componentInstance.session = {
       id: null,
-      name: '',
+      name: null,
       status: SessionStatus.SCHEDULED,
-      date: '',
+      date: null,
       photographer: this.currentUser,
       veteran: null
     };

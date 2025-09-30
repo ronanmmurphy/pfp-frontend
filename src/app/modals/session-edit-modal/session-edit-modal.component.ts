@@ -5,11 +5,11 @@ import { ToastrService } from 'ngx-toastr';
 import { UserService } from 'src/app/services/user.service';
 import { UserRole } from 'src/app/enums/user.enum';
 import { Subject, firstValueFrom, takeUntil } from 'rxjs';
-import { isFormError, isFormInvalid } from 'src/app/utils/form.helper';
+import { clearValidators, isFormError, isFormInvalid, setRequired, updateValidity } from 'src/app/utils/form.helper';
 import { IUser } from 'src/app/types/user.type';
 import { CreateSessionDto, UpdateSessionDto } from 'src/app/dtos/session.dto';
 import { ISession } from 'src/app/types/session.type';
-import { SessionStatus } from 'src/app/enums/session.enum';
+import { SessionOutcome, SessionStatus } from 'src/app/enums/session.enum';
 import { SessionService } from 'src/app/services/session.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { IPaginatedResponse } from 'src/app/types/shared.type';
@@ -34,6 +34,7 @@ export class SessionEditModalComponent {
 
   UserRole = UserRole;
   SessionStatus = SessionStatus;
+  SessionOutcome = SessionOutcome;
   isFormInvalid = isFormInvalid;
   isFormError = isFormError;
   getFullName = getFullName;
@@ -54,12 +55,15 @@ export class SessionEditModalComponent {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      name: ['', Validators.required],
+      name: [null, Validators.required],
       note: [null],
       status: [SessionStatus.SCHEDULED, Validators.required],
-      date: ['', Validators.required],
-      expirationDate: [null],
+      date: [null, Validators.required],
+      outcomePhotographer: [null, []],
+      ratePhotographer: [null, []],
       photographerFeedback: [null],
+      outcomeVeteran: [null, []],
+      rateVeteran: [null, []],
       veteranFeedback: [null],
       photographerId: [null, Validators.required],
       veteranId: [null, Validators.required]
@@ -69,9 +73,12 @@ export class SessionEditModalComponent {
       name: this.session.name,
       note: this.session?.note ?? null,
       status: this.session.status,
-      date: formatDateTimeLocal(new Date(this.session.date)),
-      expirationDate: this.session?.expirationDate ? formatDateTimeLocal(new Date(this.session.expirationDate)) : null,
+      date: this.session.date ? formatDateTimeLocal(new Date(this.session.date)) : null,
+      outcomePhotographer: this.session?.outcomePhotographer ?? null,
+      ratePhotographer: this.session?.ratePhotographer ?? null,
       photographerFeedback: this.session?.photographerFeedback ?? null,
+      outcomeVeteran: this.session?.outcomeVeteran ?? null,
+      rateVeteran: this.session?.rateVeteran ?? null,
       veteranFeedback: this.session?.veteranFeedback ?? null,
       photographerId: this.isAdmin && !this.isEdit ? null : (this.session.photographer?.id ?? null),
       veteranId: this.session.veteran?.id ?? null
@@ -86,16 +93,43 @@ export class SessionEditModalComponent {
     }
 
     this.loadAllUsers(UserRole.VETERAN).catch((err) => {
-      console.error('Failed to load veterans', err);
-      this.toastr.error('Failed to load veterans');
+      console.error('Failed to load clients', err);
+      this.toastr.error('Failed to load clients');
     });
 
     this.applyRolePermissions();
+
+    this.form
+      .get('status')
+      ?.valueChanges.pipe(takeUntil(this.destroyed$))
+      .subscribe((role) => {
+        this.applyDynamicValidators();
+        Object.keys(this.form.controls).forEach((key) => {
+          const control = this.form.get(key);
+          if (control) {
+            control.markAsPristine();
+            control.markAsUntouched();
+            control.updateValueAndValidity();
+          }
+        });
+      });
   }
 
   ngOnDestroy(): void {
     this.destroyed$.next();
     this.destroyed$.complete();
+  }
+
+  private applyDynamicValidators() {
+    clearValidators(this.form, ['outcomePhotographer', 'ratePhotographer', 'outcomeVeteran', 'rateVeteran']);
+
+    if (this.isPhotographer) {
+      setRequired(this.form, ['outcomePhotographer', 'ratePhotographer']);
+    } else if (this.isVeteran) {
+      setRequired(this.form, ['outcomeVeteran', 'rateVeteran']);
+    }
+
+    updateValidity(this.form, ['outcomePhotographer', 'ratePhotographer', 'outcomeVeteran', 'rateVeteran']);
   }
 
   private applyRolePermissions(): void {
@@ -107,7 +141,7 @@ export class SessionEditModalComponent {
     } else if (this.isVeteran) {
       // Veteran: disable all except veteranFeedback
       Object.keys(this.form.controls).forEach((key) => {
-        if (key !== 'veteranFeedback') {
+        if (key !== 'outcomeVeteran' && key !== 'rateVeteran' && key !== 'veteranFeedback') {
           this.form.controls[key].disable({ emitEvent: false });
         } else {
           this.form.controls[key].enable({ emitEvent: false });
@@ -116,7 +150,7 @@ export class SessionEditModalComponent {
     } else if (this.isPhotographer) {
       // Photographer: disable only veteranFeedback
       Object.keys(this.form.controls).forEach((key) => {
-        if (key === 'veteranFeedback') {
+        if (key === 'outcomeVeteran' || key === 'rateVeteran' || key === 'veteranFeedback') {
           this.form.controls[key].disable({ emitEvent: false });
         } else {
           this.form.controls[key].enable({ emitEvent: false });
@@ -132,7 +166,7 @@ export class SessionEditModalComponent {
   get showFeedbackFields(): boolean {
     // Show feedback fields only if status is not Scheduled or Rescheduled
     const status = this.f['status'].value;
-    return status !== SessionStatus.SCHEDULED && status !== SessionStatus.RESCHEDULED;
+    return status !== SessionStatus.SCHEDULED;
   }
 
   get isVeteran(): boolean {
@@ -158,7 +192,7 @@ export class SessionEditModalComponent {
       const mapped = (res.items || []).map((user) => ({
         ...user,
         fullName: getFullName(user.firstName, user.lastName),
-        location: getLocationText(user.streetAddress1, user.streetAddress2, user.city, user.state, user.postalCode)
+        location: getLocationText(user.streetAddress1, user.city, user.state, user.postalCode, user?.streetAddress2)
       }));
 
       all.push(...mapped);
@@ -194,8 +228,11 @@ export class SessionEditModalComponent {
       note: this.f['note'].value ?? undefined,
       status: this.f['status'].value,
       date: this.f['date'].value,
-      expirationDate: this.f['expirationDate'].value ?? undefined,
+      outcomePhotographer: this.f['outcomePhotographer'].value ?? undefined,
+      ratePhotographer: this.f['ratePhotographer'].value ?? undefined,
       photographerFeedback: this.f['photographerFeedback'].value ?? undefined,
+      outcomeVeteran: this.f['outcomeVeteran'].value ?? undefined,
+      rateVeteran: this.f['rateVeteran'].value ?? undefined,
       veteranFeedback: this.f['veteranFeedback'].value ?? undefined,
       photographerId: this.f['photographerId'].value,
       veteranId: this.f['veteranId'].value

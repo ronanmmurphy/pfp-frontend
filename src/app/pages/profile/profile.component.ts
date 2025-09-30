@@ -63,9 +63,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
       phoneNumber: ['', Validators.required],
       streetAddress1: ['', Validators.required],
       streetAddress2: [null],
-      city: [null],
-      state: [null],
-      postalCode: [null],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      postalCode: ['', Validators.required],
       latitude: [null, Validators.required],
       longitude: [null, Validators.required],
       referredBy: [null],
@@ -304,6 +304,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   saveUser() {
     if (this.userForm.invalid) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       this.userForm.markAllAsTouched();
       this.toastr.error('Please fill out all required fields correctly.');
       return;
@@ -319,7 +320,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
       if (value === undefined || value === null) return;
 
-      if (!skipFields.includes(key)) {
+      if (typeof value === 'boolean') {
+        formData.append(key, value ? 'true' : '');
+      } else if (!skipFields.includes(key)) {
         formData.append(key, value);
       }
     });

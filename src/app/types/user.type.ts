@@ -10,9 +10,9 @@ export interface IUser {
   phoneNumber: string;
   streetAddress1: string;
   streetAddress2?: string | null;
-  city?: string | null;
-  state?: string | null;
-  postalCode?: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
   latitude: number;
   longitude: number;
   referredBy?: string | null;
@@ -50,15 +50,9 @@ export interface IUser {
 
 export interface INearbyPhotographer {
   id: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  streetAddress1: string;
-  streetAddress2?: string | null;
-  city?: string | null;
-  state?: string | null;
-  postalCode?: string | null;
+  city: string;
+  state: string;
+  postalCode: string;
   latitude: number;
   longitude: number;
   distance: number;
