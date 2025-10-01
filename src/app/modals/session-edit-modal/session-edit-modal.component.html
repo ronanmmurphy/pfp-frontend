@@ -112,7 +112,7 @@
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'photographerId')">Photographer is required.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isVeteran">
     <label class="form-label">
       Session Outcome
       <span class="text-danger">*</span>
@@ -175,7 +175,7 @@
     <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'outcomePhotographer')">Please select session outcome.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isVeteran">
     <label class="form-label">
       How would you rate this session?
       <span class="text-danger">*</span>
@@ -195,7 +195,7 @@
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'ratePhotographer')">Rate is required.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isVeteran">
     <label class="form-label" for="photographerFeedback">
       (Optional) Would you like to provide any additional comments about the session?
     </label>
@@ -234,7 +234,7 @@
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'veteranId')">Client is required.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isPhotographer">
     <label class="form-label">
       Session Outcome
       <span class="text-danger">*</span>
@@ -297,7 +297,7 @@
     <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'outcomeVeteran')">Please select session outcome.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isPhotographer">
     <label class="form-label">
       How would you rate this session?
       <span class="text-danger">*</span>
@@ -317,7 +317,7 @@
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'rateVeteran')">Rate is required.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields">
+  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isPhotographer">
     <label class="form-label" for="veteranFeedback">(Optional) Would you like to provide any additional comments about the session?</label>
     <textarea
       id="veteranFeedback"
