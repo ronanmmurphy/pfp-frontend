@@ -26,3 +26,27 @@
   width: 2rem;
   height: 2rem;
 }
+
+/* Ensure the parent div allows shrinking */
+.address-select-container {
+  min-width: 0; /* IMPORTANT */
+}
+
+/* Force ng-select to shrink within flex container */
+.address-select-container ng-select {
+  width: 100%;
+  min-width: 0; /* IMPORTANT */
+}
+
+/* Fix overflow inside the select so long text does not break out */
+.address-select-container .ng-select-container {
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Truncate long selected text */
+.address-select-container .ng-value-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

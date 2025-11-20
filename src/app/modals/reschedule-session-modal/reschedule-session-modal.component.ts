@@ -47,7 +47,7 @@ export class RescheduleSessionModalComponent {
 
     this.loading = true;
     const newDate = this.form.get('date')?.value;
-    this.sessionService.updateSession(this.sessionId, { date: newDate, status: SessionStatus.SCHEDULED }).subscribe({
+    this.sessionService.updateSession(this.sessionId, { date: newDate, status: SessionStatus.COMPLETED }).subscribe({
       next: () => {
         this.toastr.success('Session rescheduled successfully.');
         this.loading = false;

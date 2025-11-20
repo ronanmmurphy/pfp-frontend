@@ -30,6 +30,11 @@ export class AuthGuard implements CanActivate {
   }
 
   private checkUserStatus(user: IUser, state: RouterStateSnapshot): boolean {
+    if (user.status === UserStatus.PENDING) {
+      this.router.navigate(['/login']);
+      return false;
+    }
+
     if (user.status === UserStatus.ONBOARDING && state.url !== '/onboarding') {
       this.router.navigate(['/onboarding']);
       return false;

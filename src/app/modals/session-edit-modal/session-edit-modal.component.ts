@@ -57,12 +57,14 @@ export class SessionEditModalComponent {
     this.form = this.fb.group({
       name: [null, Validators.required],
       note: [null],
-      status: [SessionStatus.SCHEDULED, Validators.required],
+      status: [SessionStatus.COMPLETED, Validators.required],
       date: [null, Validators.required],
       outcomePhotographer: [null, []],
+      otherOutcomePhotographer: [null, []],
       ratePhotographer: [null, []],
       photographerFeedback: [null],
       outcomeVeteran: [null, []],
+      otherOutcomeVeteran: [null, []],
       rateVeteran: [null, []],
       veteranFeedback: [null],
       photographerId: [null, Validators.required],
@@ -75,9 +77,11 @@ export class SessionEditModalComponent {
       status: this.session.status,
       date: this.session.date ? formatDateTimeLocal(new Date(this.session.date)) : null,
       outcomePhotographer: this.session?.outcomePhotographer ?? null,
+      otherOutcomePhotographer: this.session?.otherOutcomePhotographer ?? null,
       ratePhotographer: this.session?.ratePhotographer ?? null,
       photographerFeedback: this.session?.photographerFeedback ?? null,
       outcomeVeteran: this.session?.outcomeVeteran ?? null,
+      otherOutcomeVeteran: this.session?.otherOutcomeVeteran ?? null,
       rateVeteran: this.session?.rateVeteran ?? null,
       veteranFeedback: this.session?.veteranFeedback ?? null,
       photographerId: this.isAdmin && !this.isEdit ? null : (this.session.photographer?.id ?? null),
@@ -135,28 +139,32 @@ export class SessionEditModalComponent {
   private applyRolePermissions(): void {
     if (!this.form) return;
 
-    if (this.isAdmin) {
-      // Admin: enable everything
-      this.form.enable({ emitEvent: false });
-    } else if (this.isVeteran) {
-      // Veteran: disable all except veteranFeedback
-      Object.keys(this.form.controls).forEach((key) => {
-        if (key !== 'outcomeVeteran' && key !== 'rateVeteran' && key !== 'veteranFeedback') {
-          this.form.controls[key].disable({ emitEvent: false });
-        } else {
-          this.form.controls[key].enable({ emitEvent: false });
-        }
-      });
-    } else if (this.isPhotographer) {
-      // Photographer: disable only veteranFeedback
-      Object.keys(this.form.controls).forEach((key) => {
-        if (key === 'outcomeVeteran' || key === 'rateVeteran' || key === 'veteranFeedback') {
-          this.form.controls[key].disable({ emitEvent: false });
-        } else {
-          this.form.controls[key].enable({ emitEvent: false });
-        }
-      });
-    }
+    // if (this.isAdmin) {
+    //   // Admin: enable everything
+    //   this.form.enable({ emitEvent: false });
+    // } else if (this.isVeteran) {
+    //   // Veteran: disable all except veteranFeedback
+    //   Object.keys(this.form.controls).forEach((key) => {
+    //     if (key !== 'outcomeVeteran' && key !== 'rateVeteran' && key !== 'veteranFeedback') {
+    //       this.form.controls[key].disable({ emitEvent: false });
+    //     } else {
+    //       this.form.controls[key].enable({ emitEvent: false });
+    //     }
+    //   });
+    // } else if (this.isPhotographer) {
+    //   // Photographer: disable only veteranFeedback
+    //   Object.keys(this.form.controls).forEach((key) => {
+    //     if (key === 'outcomeVeteran' || key === 'rateVeteran' || key === 'veteranFeedback') {
+    //       this.form.controls[key].disable({ emitEvent: false });
+    //     } else {
+    //       this.form.controls[key].enable({ emitEvent: false });
+    //     }
+    //   });
+    // }
+
+    Object.keys(this.form.controls).forEach((key) => {
+      this.form.controls[key].disable({ emitEvent: false });
+    });
   }
 
   get f() {
@@ -166,7 +174,7 @@ export class SessionEditModalComponent {
   get showFeedbackFields(): boolean {
     // Show feedback fields only if status is not Scheduled or Rescheduled
     const status = this.f['status'].value;
-    return status !== SessionStatus.SCHEDULED;
+    return status !== SessionStatus.COMPLETED;
   }
 
   get isVeteran(): boolean {

@@ -19,7 +19,7 @@ export interface IUser {
   reasonForDenying?: string | null;
   // Photographer
   website?: string | null;
-  maxSessionsPerMonth?: number;
+  openToReferrals: boolean;
   // Photographer Onboarding
   mailingStreetAddress1?: string | null;
   mailingStreetAddress2?: string | null;
@@ -28,10 +28,7 @@ export interface IUser {
   mailingPostalCode?: string | null;
   closestBase?: string | null;
   agreeToCriminalBackgroundCheck?: boolean | null;
-  xLink?: string | null;
-  facebookLink?: string | null;
-  linkedinLink?: string | null;
-  instagramLink?: string | null;
+  socialMedia?: string | null;
   isHomeStudio?: boolean | null;
   partOfHomeStudio?: string | null;
   isSeparateEntrance?: boolean | null;

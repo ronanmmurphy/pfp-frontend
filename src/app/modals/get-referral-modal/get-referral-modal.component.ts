@@ -34,8 +34,8 @@ export class GetReferralModalComponent implements OnInit, AfterViewInit, OnDestr
   selectedAddress: any = null;
   addressInput$ = new Subject<string>();
 
-  selectedRadius = 'Nearest to me';
-  locationOptions = ['Nearest to me', '10 miles', '50 miles', '100 miles', 'Custom Radius...'];
+  selectedRadius = '10 miles';
+  locationOptions = ['10 miles', '50 miles', '100 miles', 'Custom Radius...'];
   customRadius: number | null = null;
 
   photographers: INearbyPhotographer[] = [];
@@ -195,11 +195,8 @@ export class GetReferralModalComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   getRadiusFromText() {
-    let radius = 3;
+    let radius = 10;
     switch (this.selectedRadius) {
-      case 'Nearest to me':
-        radius = 3;
-        break;
       case '10 miles':
         radius = 10;
         break;

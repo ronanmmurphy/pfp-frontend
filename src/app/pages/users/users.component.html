@@ -20,6 +20,7 @@
           <label class="form-label">Status</label>
           <select class="form-control form-control-sm" [formControl]="form.controls.status">
             <option [ngValue]="null">All</option>
+            <option [ngValue]="UserStatus.PENDING">Pending</option>
             <option [ngValue]="UserStatus.ONBOARDING">Onboarding</option>
             <option [ngValue]="UserStatus.APPROVED">Approved</option>
             <option [ngValue]="UserStatus.DENIED">Denied</option>
@@ -74,7 +75,7 @@
                   [ngClass]="{
                     'bg-warning': user.status === UserStatus.ONBOARDING,
                     'bg-info': user.status === UserStatus.APPROVED,
-                    'bg-danger': user.status === UserStatus.DENIED
+                    'bg-danger': user.status === UserStatus.DENIED || user.status === UserStatus.PENDING
                   }"
                 >
                   {{ getUserStatusText(user.status) }}

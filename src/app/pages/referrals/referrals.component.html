@@ -1,0 +1,107 @@
+<div class="py-3">
+  <!-- Filters -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Search</label>
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Search by photographer"
+            [formControl]="form.controls.search"
+          />
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">Status</label>
+          <select class="form-control form-control-sm" [formControl]="form.controls.status">
+            <option value="null">All</option>
+            <option [ngValue]="ReferralStatus.MATCHED">Matched</option>
+            <option [ngValue]="ReferralStatus.CANCELED">Canceled</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">From</label>
+          <input type="date" class="form-control form-control-sm" [formControl]="form.controls.dateFrom" />
+        </div>
+
+        <div class="col-md-2">
+          <label class="form-label">To</label>
+          <input type="date" class="form-control form-control-sm" [formControl]="form.controls.dateTo" />
+        </div>
+
+        <div class="col-md-3">
+          <button class="btn btn-primary w-100 mb-2" *ngIf="currentUser?.role === UserRole.VETERAN" type="button" (click)="getReferral()">
+            Get a Referral
+          </button>
+          <button class="btn btn-outline-primary w-100" (click)="resetFilters()">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sessions -->
+  <div class="card">
+    <div class="card-header d-flex align-items-center justify-content-between">
+      <h4>Referrals</h4>
+    </div>
+    <div class="card-body">
+      <div *ngIf="loading" class="text-muted mb-2">Loading…</div>
+
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Status</th>
+              <th *ngIf="currentUser?.role !== UserRole.PHOTOGRAPHER">Photographer</th>
+              <th *ngIf="currentUser?.role !== UserRole.VETERAN">Client</th>
+              <th *ngIf="currentUser?.role === UserRole.ADMIN">Last Followed Up</th>
+              <th *ngIf="currentUser?.role === UserRole.ADMIN">Followed Up Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of referrals; trackBy: trackById">
+              <td>{{ r.createdAt | date: 'medium' }}</td>
+              <td>
+                <span class="d-block">
+                  <i class="badge-circle f-10 m-r-5" [ngClass]="getReferralBadgeClass(r.status)"></i>
+                  {{ getReferralStatusText(r.status) }}
+                </span>
+              </td>
+              <td *ngIf="currentUser?.role !== UserRole.PHOTOGRAPHER">
+                {{ getFullName(r.photographer.firstName, r.photographer.lastName) }}
+              </td>
+              <td *ngIf="currentUser?.role !== UserRole.VETERAN">{{ getFullName(r.veteran.firstName, r.veteran.lastName) }}</td>
+              <td *ngIf="currentUser?.role === UserRole.ADMIN">{{ r.lastFollowedUpAt | date: 'medium' }}</td>
+              <td *ngIf="currentUser?.role === UserRole.ADMIN">{{ r.followUpCount }}</td>
+            </tr>
+            <tr *ngIf="referrals.length === 0">
+              <td class="text-muted" colspan="3">No referrals found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+          <label class="me-2">Rows per page:</label>
+          <select class="form-select d-inline-block" style="width: auto" [ngModel]="pageSize" (ngModelChange)="changePageSize($event)">
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+            <option [ngValue]="50">50</option>
+          </select>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary" [disabled]="page <= 1" (click)="prevPage()">Prev</button>
+          <span>Page {{ page }} / {{ totalPages }}</span>
+          <button class="btn btn-outline-secondary" [disabled]="page >= totalPages" (click)="nextPage()">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

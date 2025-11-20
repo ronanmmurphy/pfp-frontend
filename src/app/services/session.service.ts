@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { SessionStatus } from '../enums/session.enum';
-import { CreateSessionDto, GetSessionsQuery, UpdateSessionDto } from '../dtos/session.dto';
+import { CreateSessionDto, CreateSessionFromEmailDto, GetSessionsQuery, UpdateSessionDto } from '../dtos/session.dto';
 import { IPaginatedResponse } from '../types/shared.type';
 import { ISession } from '../types/session.type';
 
@@ -12,6 +12,10 @@ export class SessionService {
 
   createSession(payload: CreateSessionDto): Observable<ISession> {
     return this.http.post<ISession>('/sessions', payload);
+  }
+
+  createSessionFromEmail(payload: CreateSessionFromEmailDto): Observable<any> {
+    return this.http.post<any>('/sessions/create/from-email', payload);
   }
 
   getSessions(query: GetSessionsQuery): Observable<IPaginatedResponse<ISession>> {

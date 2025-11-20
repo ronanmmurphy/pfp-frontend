@@ -7,9 +7,11 @@ export interface ISession {
   status: SessionStatus;
   date: string;
   outcomePhotographer?: SessionOutcome | null;
+  otherOutcomePhotographer?: string | null;
   ratePhotographer?: number | null;
   photographerFeedback?: string | null;
   outcomeVeteran?: SessionOutcome | null;
+  otherOutcomeVeteran?: string | null;
   rateVeteran?: number | null;
   veteranFeedback?: string | null;
   photographer: {

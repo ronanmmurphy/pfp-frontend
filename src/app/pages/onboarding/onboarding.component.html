@@ -136,71 +136,20 @@
             </div>
 
             <div class="form-group mb-3">
-              <label class="form-label" for="xLink">
-                Link To Your X Profile
+              <label class="form-label" for="socialMedia">
+                Link To Your Social Media Profile
                 <span class="text-danger">*</span>
               </label>
               <input
-                id="xLink"
+                id="socialMedia"
                 type="text"
                 class="form-control"
-                formControlName="xLink"
-                placeholder="Link To Your X Profile"
-                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'xLink') }"
+                formControlName="socialMedia"
+                placeholder="Link To Your Social Media Profile"
+                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'socialMedia') }"
                 [disabled]="submitting"
               />
-              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'xLink')">X Profile link is required.</div>
-            </div>
-
-            <div class="form-group mb-3">
-              <label class="form-label" for="facebookLink">
-                Link To Your Facebook Profile
-                <span class="text-danger">*</span>
-              </label>
-              <input
-                id="facebookLink"
-                type="text"
-                class="form-control"
-                formControlName="facebookLink"
-                placeholder="Link To Your Facebook Profile"
-                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'facebookLink') }"
-                [disabled]="submitting"
-              />
-              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'facebookLink')">Facebook Profile link is required.</div>
-            </div>
-
-            <div class="form-group mb-3">
-              <label class="form-label" for="linkedinLink">
-                Link To Your LinkedIn Profile
-                <span class="text-danger">*</span>
-              </label>
-              <input
-                id="linkedinLink"
-                type="text"
-                class="form-control"
-                formControlName="linkedinLink"
-                placeholder="Link To Your LinkedIn Profile"
-                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'linkedinLink') }"
-                [disabled]="submitting"
-              />
-              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'linkedinLink')">LinkedIn Profile link is required.</div>
-            </div>
-
-            <div class="form-group mb-3">
-              <label class="form-label" for="instagramLink">
-                Link To Your Instagram Profile
-                <span class="text-danger">*</span>
-              </label>
-              <input
-                id="instagramLink"
-                type="text"
-                class="form-control"
-                formControlName="instagramLink"
-                placeholder="Link To Your Instagram Profile"
-                [ngClass]="{ 'is-invalid': isFormInvalid(form, 'instagramLink') }"
-                [disabled]="submitting"
-              />
-              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'instagramLink')">Instagram Profile link is required.</div>
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'socialMedia')">Social Media Profile Link is required.</div>
             </div>
 
             <div class="form-group mb-3">

@@ -23,20 +23,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // role & user
   role?: UserRole;
 
+  openToReferrals = true;
+
   // admin totals
   veterans = 0;
   photographers = 0;
+  pendingPhotographers = 0;
   onboardingPhotographers = 0;
   approvedPhotographers = 0;
   deniedPhotographers = 0;
   sessionsCompleted = 0;
-  sessionsCanceled = 0;
-  sessionsActive = 0;
+  sessionsIncomplete = 0;
 
   // user totals (photographer / veteran)
   mySessionsCompleted = 0;
-  mySessionsCanceled = 0;
-  mySessionsActive = 0;
+  mySessionsIncomplete = 0;
 
   loading = true;
 
@@ -53,6 +54,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((user) => {
           this.role = user.role;
+          this.openToReferrals = user.openToReferrals;
           const stats$ = user.role === UserRole.ADMIN ? this.dash.getAdminStats() : this.dash.getMyStats();
           return stats$.pipe(
             catchError((err) => {
@@ -73,17 +75,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
           const adminStats = stats as AdminStats;
           this.veterans = adminStats.veterans;
           this.photographers = adminStats.photographers;
+          this.pendingPhotographers = adminStats.pendingPhotographers;
           this.onboardingPhotographers = adminStats.onboardingPhotographers;
           this.approvedPhotographers = adminStats.approvedPhotographers;
           this.deniedPhotographers = adminStats.deniedPhotographers;
           this.sessionsCompleted = adminStats.sessionsCompleted;
-          this.sessionsCanceled = adminStats.sessionsCanceled;
-          this.sessionsActive = adminStats.sessionsActive;
+          this.sessionsIncomplete = adminStats.sessionsIncomplete;
         } else {
           const userStats = stats as UserStats;
           this.mySessionsCompleted = userStats.sessionsCompleted;
-          this.mySessionsCanceled = userStats.sessionsCanceled;
-          this.mySessionsActive = userStats.sessionsActive;
+          this.mySessionsIncomplete = userStats.sessionsIncomplete;
         }
 
         this.loading = false;

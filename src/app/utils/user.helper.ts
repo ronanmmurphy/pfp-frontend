@@ -9,7 +9,8 @@ export const UserRoleLabel: Record<UserRole, string> = {
 export const UserStatusLabel: Record<UserStatus, string> = {
   [UserStatus.ONBOARDING]: 'Onboarding',
   [UserStatus.APPROVED]: 'Approved',
-  [UserStatus.DENIED]: 'Denied'
+  [UserStatus.DENIED]: 'Denied',
+  [UserStatus.PENDING]: 'Pending'
 };
 
 export const EligibilityLabel: Record<Eligibility, string> = {

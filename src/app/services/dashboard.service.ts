@@ -6,18 +6,17 @@ import { SessionStatus } from '../enums/session.enum';
 export interface AdminStats {
   veterans: number;
   photographers: number;
+  pendingPhotographers: number;
   onboardingPhotographers: number;
   approvedPhotographers: number;
   deniedPhotographers: number;
   sessionsCompleted: number;
-  sessionsCanceled: number;
-  sessionsActive: number;
+  sessionsIncomplete: number;
 }
 
 export interface UserStats {
   sessionsCompleted: number;
-  sessionsCanceled: number;
-  sessionsActive: number;
+  sessionsIncomplete: number;
 }
 
 export interface SessionRow {

@@ -41,6 +41,16 @@ export const NavigationItems: NavigationItem[] = [
     roles: [0]
   },
   {
+    id: 'referrals',
+    title: 'Referrals',
+    type: 'item',
+    classes: 'nav-item',
+    url: '/referrals',
+    icon: 'ant-design',
+    breadcrumbs: false,
+    roles: [0, 1, 2]
+  },
+  {
     id: 'sessions',
     title: 'Sessions',
     type: 'item',

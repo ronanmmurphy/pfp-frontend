@@ -24,14 +24,15 @@ export class UserEditModalComponent {
     firstName: '',
     lastName: '',
     role: UserRole.PHOTOGRAPHER,
-    status: UserStatus.ONBOARDING,
+    status: UserStatus.PENDING,
     phoneNumber: '',
     streetAddress1: '',
     city: '',
     state: '',
     postalCode: '',
     latitude: null,
-    longitude: null
+    longitude: null,
+    openToReferrals: true
   };
   @Input() isEdit = false;
   @Output() save = new EventEmitter<void>();
@@ -67,7 +68,7 @@ export class UserEditModalComponent {
     this.form = this.fb.group(
       {
         role: [UserRole.PHOTOGRAPHER, [Validators.required]],
-        status: [UserStatus.ONBOARDING, [Validators.required]],
+        status: [UserStatus.PENDING, [Validators.required]],
         firstName: ['', [Validators.required]],
         lastName: ['', [Validators.required]],
         email: ['', [Validators.required, Validators.email]],
@@ -85,7 +86,7 @@ export class UserEditModalComponent {
         reasonForDenying: [null, []],
         // Photographer
         website: [null, []],
-        maxSessionsPerMonth: [null],
+        openToReferrals: [true, Validators.required],
         // Photographer Onboarding
         mailingStreetAddress1: [null, []],
         mailingStreetAddress2: [null],
@@ -94,10 +95,7 @@ export class UserEditModalComponent {
         mailingPostalCode: [null],
         closestBase: [null, []],
         agreeToCriminalBackgroundCheck: [null, []],
-        xLink: [null, []],
-        facebookLink: [null, []],
-        linkedinLink: [null, []],
-        instagramLink: [null, []],
+        socialMedia: [null, []],
         isHomeStudio: [null, []],
         partOfHomeStudio: [null, []],
         isSeparateEntrance: [null, []],
@@ -140,7 +138,7 @@ export class UserEditModalComponent {
             control.updateValueAndValidity();
           }
         });
-        const status = role === UserRole.PHOTOGRAPHER ? UserStatus.ONBOARDING : UserStatus.APPROVED;
+        const status = role === UserRole.PHOTOGRAPHER ? UserStatus.PENDING : UserStatus.APPROVED;
         this.form.get('status')?.setValue(status);
       });
 
@@ -152,10 +150,7 @@ export class UserEditModalComponent {
           'mailingStreetAddress1',
           'closestBase',
           'agreeToCriminalBackgroundCheck',
-          'xLink',
-          'facebookLink',
-          'linkedinLink',
-          'instagramLink',
+          'socialMedia',
           'isHomeStudio',
           'partOfHomeStudio',
           'isSeparateEntrance',
@@ -167,10 +162,7 @@ export class UserEditModalComponent {
             'mailingStreetAddress1',
             'closestBase',
             'agreeToCriminalBackgroundCheck',
-            'xLink',
-            'facebookLink',
-            'linkedinLink',
-            'instagramLink',
+            'socialMedia',
             'isHomeStudio',
             'agreeToVolunteerAgreement'
           ]);
@@ -179,10 +171,7 @@ export class UserEditModalComponent {
           'mailingStreetAddress1',
           'closestBase',
           'agreeToCriminalBackgroundCheck',
-          'xLink',
-          'facebookLink',
-          'linkedinLink',
-          'instagramLink',
+          'socialMedia',
           'isHomeStudio',
           'partOfHomeStudio',
           'isSeparateEntrance',
@@ -251,10 +240,7 @@ export class UserEditModalComponent {
       'mailingStreetAddress1',
       'closestBase',
       'agreeToCriminalBackgroundCheck',
-      'xLink',
-      'facebookLink',
-      'linkedinLink',
-      'instagramLink',
+      'socialMedia',
       'isHomeStudio',
       'partOfHomeStudio',
       'isSeparateEntrance',
@@ -271,10 +257,7 @@ export class UserEditModalComponent {
           'mailingStreetAddress1',
           'closestBase',
           'agreeToCriminalBackgroundCheck',
-          'xLink',
-          'facebookLink',
-          'linkedinLink',
-          'instagramLink',
+          'socialMedia',
           'isHomeStudio',
           'agreeToVolunteerAgreement'
         ]);
@@ -301,10 +284,7 @@ export class UserEditModalComponent {
       'mailingStreetAddress1',
       'closestBase',
       'agreeToCriminalBackgroundCheck',
-      'xLink',
-      'facebookLink',
-      'linkedinLink',
-      'instagramLink',
+      'socialMedia',
       'isHomeStudio',
       'partOfHomeStudio',
       'isSeparateEntrance',

@@ -3,32 +3,7 @@
   <div class="card mb-3">
     <div class="card-body">
       <div class="row g-3 align-items-end">
-        <div class="col-md-2">
-          <label class="form-label">View</label>
-          <div class="btn-group w-100" role="group">
-            <button
-              type="button"
-              class="btn btn-outline-primary btn-sm"
-              [class.active]="selectedView === 'thisMonth'"
-              (click)="setView('thisMonth')"
-            >
-              This Month
-            </button>
-            <button
-              type="button"
-              class="btn btn-outline-primary btn-sm"
-              [class.active]="selectedView === 'waitlist'"
-              (click)="setView('waitlist')"
-            >
-              Waitlist
-            </button>
-            <button type="button" class="btn btn-outline-primary btn-sm" [class.active]="selectedView === 'all'" (click)="setView('all')">
-              All
-            </button>
-          </div>
-        </div>
-
-        <div class="col-md-2">
+        <div class="col-md-3">
           <label class="form-label">Search</label>
           <input
             type="text"
@@ -42,9 +17,8 @@
           <label class="form-label">Status</label>
           <select class="form-control form-control-sm" [formControl]="form.controls.status">
             <option value="null">All</option>
-            <option [ngValue]="SessionStatus.SCHEDULED">Scheduled</option>
             <option [ngValue]="SessionStatus.COMPLETED">Completed</option>
-            <option [ngValue]="SessionStatus.CANCELED">Canceled</option>
+            <option [ngValue]="SessionStatus.INCOMPLETE">Incomplete</option>
           </select>
         </div>
 
@@ -58,13 +32,7 @@
           <input type="date" class="form-control form-control-sm" [formControl]="form.controls.dateTo" />
         </div>
 
-        <div class="col-md-2">
-          <button class="btn btn-primary w-100 mb-2" type="button" (click)="createSession()" *ngIf="currentUser?.role !== UserRole.VETERAN">
-            Create a Session
-          </button>
-          <button class="btn btn-primary w-100 mb-2" type="button" (click)="getReferral()" *ngIf="currentUser?.role === UserRole.VETERAN">
-            Get a Referral
-          </button>
+        <div class="col-md-3">
           <button class="btn btn-outline-primary w-100" (click)="resetFilters()">Reset</button>
         </div>
       </div>
@@ -74,15 +42,13 @@
   <!-- Sessions -->
   <div class="card">
     <div class="card-header d-flex align-items-center justify-content-between">
-      <h4>
-        {{ selectedView === 'thisMonth' ? 'Sessions of This Month' : selectedView === 'waitlist' ? 'Waitlist' : 'All Sessions' }}
-      </h4>
-      <div *ngIf="currentUser?.role === UserRole.PHOTOGRAPHER" class="d-flex align-items-center gap-4">
+      <h4>Sessions</h4>
+      <!-- <div *ngIf="currentUser?.role === UserRole.PHOTOGRAPHER" class="d-flex align-items-center gap-4">
         <h5>{{ rows.length }} sessions / {{ currentUser?.maxSessionsPerMonth || 'NaN' }}</h5>
         <button class="btn btn-primary" (click)="setMaxSessionsPerMonth()">
           <i antIcon type="setting" theme="outline"></i>
         </button>
-      </div>
+      </div> -->
     </div>
     <div class="card-body">
       <div *ngIf="loading" class="text-muted mb-2">Loading…</div>
@@ -91,7 +57,7 @@
         <table class="table table-hover mb-0">
           <thead>
             <tr>
-              <th>Session Name</th>
+              <!-- <th>Session Name</th> -->
               <th>Date</th>
               <th>Status</th>
               <th *ngIf="currentUser?.role !== UserRole.PHOTOGRAPHER">Photographer</th>
@@ -105,7 +71,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let s of rows; trackBy: trackById">
-              <td>{{ s.name }}</td>
+              <!-- <td>{{ s.name }}</td> -->
               <td>{{ s.date | date: 'medium' }}</td>
               <td>
                 <span class="d-block">
@@ -151,7 +117,7 @@
                 <div ngbDropdown class="d-inline-block" container="body">
                   <button class="btn btn-outline-primary btn-sm" ngbDropdownToggle [disabled]="loading">Actions</button>
                   <div ngbDropdownMenu>
-                    <button ngbDropdownItem (click)="editSession(s)">{{ currentUser?.role === UserRole.VETERAN ? 'View' : 'Edit' }}</button>
+                    <button ngbDropdownItem (click)="editSession(s)">View</button>
                     <!-- <button
                       ngbDropdownItem
                       (click)="openRescheduleModal(s)"

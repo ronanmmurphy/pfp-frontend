@@ -17,7 +17,6 @@ import { getFullName, getLocationText } from 'src/app/utils/user.helper';
 import { IPaginatedResponse } from 'src/app/types/shared.type';
 import { ISession } from 'src/app/types/session.type';
 import { SessionEditModalComponent } from 'src/app/modals/session-edit-modal/session-edit-modal.component';
-import { SetMaxSessionsModalComponent } from 'src/app/modals/set-max-sessions-modal/set-max-sessions-modal.component';
 import { GetReferralModalComponent } from 'src/app/modals/get-referral-modal/get-referral-modal.component';
 
 @Component({
@@ -190,7 +189,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     modalRef.componentInstance.session = {
       id: null,
       name: null,
-      status: SessionStatus.SCHEDULED,
+      status: SessionStatus.COMPLETED,
       date: null,
       photographer: this.currentUser,
       veteran: null
@@ -226,30 +225,30 @@ export class SessionsComponent implements OnInit, OnDestroy {
     );
   }
 
-  setMaxSessionsPerMonth() {
-    const modalRef = this.modalService.open(SetMaxSessionsModalComponent, {
-      size: 'lg',
-      backdrop: 'static'
-    });
-    modalRef.componentInstance.userId = this.currentUser.id;
-    modalRef.componentInstance.maxSessionsPerMonth = this.currentUser.maxSessionsPerMonth;
+  // setMaxSessionsPerMonth() {
+  //   const modalRef = this.modalService.open(SetMaxSessionsModalComponent, {
+  //     size: 'lg',
+  //     backdrop: 'static'
+  //   });
+  //   modalRef.componentInstance.userId = this.currentUser.id;
+  //   modalRef.componentInstance.maxSessionsPerMonth = this.currentUser.maxSessionsPerMonth;
 
-    modalRef.result.then(
-      () => {
-        this.auth.refreshCurrentUser().subscribe({
-          next: (user) => {
-            this.currentUser = user;
-          },
-          error: (err) => {
-            console.error('Failed to refresh current user', err);
-          }
-        });
-      },
-      () => {
-        // Modal dismissed
-      }
-    );
-  }
+  //   modalRef.result.then(
+  //     () => {
+  //       this.auth.refreshCurrentUser().subscribe({
+  //         next: (user) => {
+  //           this.currentUser = user;
+  //         },
+  //         error: (err) => {
+  //           console.error('Failed to refresh current user', err);
+  //         }
+  //       });
+  //     },
+  //     () => {
+  //       // Modal dismissed
+  //     }
+  //   );
+  // }
 
   getReferral() {
     const modalRef = this.modalService.open(GetReferralModalComponent, {

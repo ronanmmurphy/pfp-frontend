@@ -9,6 +9,8 @@
             <div class="text-muted mb-2">Photographers</div>
             <div class="fs-3 fw-bold">
               {{ photographers | number }} /
+              {{ pendingPhotographers | number }}
+              <small>Pending,</small>
               {{ onboardingPhotographers | number }}
               <small>Onboarding,</small>
               {{ approvedPhotographers | number }}
@@ -20,18 +22,28 @@
         </div>
       </div>
 
-      <div class="col-md-4"><app-stats-card title="Active Sessions" [value]="sessionsActive"></app-stats-card></div>
-      <div class="col-md-4"><app-stats-card title="Successful Sessions" [value]="sessionsCompleted"></app-stats-card></div>
-      <div class="col-md-4"><app-stats-card title="Canceled Sessions" [value]="sessionsCanceled"></app-stats-card></div>
+      <div class="col-md-4"><app-stats-card title="Total Sessions" [value]="sessionsCompleted + sessionsIncomplete"></app-stats-card></div>
+      <div class="col-md-4"><app-stats-card title="Completed Sessions" [value]="sessionsCompleted"></app-stats-card></div>
+      <div class="col-md-4"><app-stats-card title="Incomplete Sessions" [value]="sessionsIncomplete"></app-stats-card></div>
     </div>
   </ng-container>
 
   <!-- PHOTOGRAPHER / VETERAN VIEW -->
   <ng-template #nonAdmin>
     <div class="row">
-      <div class="col-md-4"><app-stats-card title="Your Active Sessions" [value]="mySessionsActive"></app-stats-card></div>
-      <div class="col-md-4"><app-stats-card title="Your Successful Sessions" [value]="mySessionsCompleted"></app-stats-card></div>
-      <div class="col-md-4"><app-stats-card title="Your Canceled Sessions" [value]="mySessionsCanceled"></app-stats-card></div>
+      <div class="col-md-4">
+        <app-stats-card title="Total Sessions" [value]="mySessionsCompleted + mySessionsIncomplete"></app-stats-card>
+      </div>
+      <div class="col-md-4"><app-stats-card title="Completed Sessions" [value]="mySessionsCompleted"></app-stats-card></div>
+      <div class="col-md-4"><app-stats-card title="Incomplete Sessions" [value]="mySessionsIncomplete"></app-stats-card></div>
+    </div>
+
+    <div class="row" *ngIf="role === UserRole.PHOTOGRAPHER">
+      <div class="col-md-12">
+        <div class="alert" [class.alert-info]="openToReferrals" [class.alert-danger]="!openToReferrals" role="alert">
+          {{ openToReferrals ? 'You are open to referrals!' : 'You are not open to referrals.' }}
+        </div>
+      </div>
     </div>
   </ng-template>
 </div>

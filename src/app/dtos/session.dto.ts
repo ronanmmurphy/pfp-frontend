@@ -15,6 +15,17 @@ export interface CreateSessionDto {
   veteranId: number;
 }
 
+export interface CreateSessionFromEmailDto {
+  referralId: number;
+  userId: number;
+  date: string;
+  status: SessionStatus;
+  outcome: SessionOutcome;
+  otherOutcome?: string | null;
+  rate: number;
+  feedback?: string | null;
+}
+
 export interface GetSessionsQuery {
   search?: string;
   status?: SessionStatus;

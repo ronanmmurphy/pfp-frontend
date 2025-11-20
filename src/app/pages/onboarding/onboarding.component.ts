@@ -54,10 +54,7 @@ export class OnboardingComponent {
       mailingPostalCode: [null],
       closestBase: [null, [Validators.required]],
       agreeToCriminalBackgroundCheck: [null, [Validators.required]],
-      xLink: [null, [Validators.required]],
-      facebookLink: [null, [Validators.required]],
-      linkedinLink: [null, [Validators.required]],
-      instagramLink: [null, [Validators.required]],
+      socialMedia: [null, [Validators.required]],
       isHomeStudio: [null, [Validators.required]],
       partOfHomeStudio: [null, []],
       isSeparateEntrance: [null, []],
@@ -152,7 +149,7 @@ export class OnboardingComponent {
     });
 
     this.userService
-      .updateUserWithFiles(this.user.id, formData)
+      .updateUserWithFiles(this.user.id, formData, 'onboarding')
       .pipe(takeUntil(this.destroyed$))
       .subscribe({
         next: () => {

@@ -24,6 +24,11 @@ const routes: Routes = [
         canActivate: [AuthGuard]
       },
       {
+        path: 'referrals',
+        loadComponent: () => import('./pages/referrals/referrals.component').then((c) => c.ReferralsComponent),
+        canActivate: [AuthGuard]
+      },
+      {
         path: 'sessions',
         loadComponent: () => import('./pages/sessions/sessions.component').then((c) => c.SessionsComponent),
         canActivate: [AuthGuard]
@@ -47,6 +52,10 @@ const routes: Routes = [
   {
     path: 'register',
     loadComponent: () => import('./pages/auth-register/auth-register.component').then((c) => c.AuthRegisterComponent)
+  },
+  {
+    path: 'session-feedback',
+    loadComponent: () => import('./pages/session-feedback/session-feedback.component').then((c) => c.SessionFeedbackComponent)
   },
   {
     path: '**',

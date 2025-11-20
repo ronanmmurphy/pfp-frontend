@@ -71,7 +71,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       referredBy: [null],
       // Photographer
       website: [null, []],
-      maxSessionsPerMonth: [null],
+      openToReferrals: [true, Validators.required],
       // Photographer Onboarding
       mailingStreetAddress1: [null, []],
       mailingStreetAddress2: [null],
@@ -80,10 +80,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       mailingPostalCode: [null],
       closestBase: [null, []],
       agreeToCriminalBackgroundCheck: [null, []],
-      xLink: [null, []],
-      facebookLink: [null, []],
-      linkedinLink: [null, []],
-      instagramLink: [null, []],
+      socialMedia: [null, []],
       isHomeStudio: [null, []],
       partOfHomeStudio: [null, []],
       isSeparateEntrance: [null, []],
@@ -192,10 +189,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       'mailingStreetAddress1',
       'closestBase',
       'agreeToCriminalBackgroundCheck',
-      'xLink',
-      'facebookLink',
-      'linkedinLink',
-      'instagramLink',
+      'socialMedia',
       'isHomeStudio',
       'partOfHomeStudio',
       'isSeparateEntrance',
@@ -212,10 +206,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
           'mailingStreetAddress1',
           'closestBase',
           'agreeToCriminalBackgroundCheck',
-          'xLink',
-          'facebookLink',
-          'linkedinLink',
-          'instagramLink',
+          'socialMedia',
           'isHomeStudio',
           'agreeToVolunteerAgreement'
         ]);
@@ -237,10 +228,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       'mailingStreetAddress1',
       'closestBase',
       'agreeToCriminalBackgroundCheck',
-      'xLink',
-      'facebookLink',
-      'linkedinLink',
-      'instagramLink',
+      'socialMedia',
       'isHomeStudio',
       'partOfHomeStudio',
       'isSeparateEntrance',
@@ -335,7 +323,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     });
 
     this.userService
-      .updateUserWithFiles(this.userId, formData)
+      .updateUserWithFiles(this.userId, formData, 'profile')
       .pipe(takeUntil(this.destroyed$))
       .subscribe({
         next: () => {

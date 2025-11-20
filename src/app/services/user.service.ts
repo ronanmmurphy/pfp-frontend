@@ -49,8 +49,8 @@ export class UserService {
     return this.http.patch<IUser>(`/users/${id}`, payload);
   }
 
-  updateUserWithFiles(id: number, formData: FormData): Observable<IUser> {
-    return this.http.patch<IUser>(`/users/${id}`, formData);
+  updateUserWithFiles(id: number, formData: FormData, from?: string): Observable<IUser> {
+    return this.http.patch<IUser>(`/users/${id}${from ? `?from=${from}` : ''}`, formData);
   }
 
   deleteUser(id: number): Observable<void> {

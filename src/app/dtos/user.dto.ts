@@ -41,7 +41,7 @@ export interface CreateUserDto {
   reasonForDenying?: string;
   // Photographer
   website?: string;
-  maxSessionsPerMonth?: number;
+  openToReferrals: boolean;
   // Photographer Onboarding
   mailingStreetAddress1?: string;
   mailingStreetAddress2?: string;
@@ -50,10 +50,7 @@ export interface CreateUserDto {
   mailingPostalCode?: string;
   closestBase?: string;
   agreeToCriminalBackgroundCheck?: boolean;
-  xLink?: string;
-  facebookLink?: string;
-  linkedinLink?: string;
-  instagramLink?: string;
+  socialMedia?: string;
   isHomeStudio?: boolean;
   partOfHomeStudio?: string;
   isSeparateEntrance?: boolean;

@@ -139,14 +139,15 @@ export class UsersComponent implements OnInit, OnDestroy {
       firstName: '',
       lastName: '',
       role: UserRole.PHOTOGRAPHER,
-      status: UserStatus.ONBOARDING,
+      status: UserStatus.PENDING,
       phoneNumber: '',
       streetAddress1: '',
       city: '',
       state: '',
       postalCode: '',
       latitude: null,
-      longitude: null
+      longitude: null,
+      openToReferrals: true
     };
     this.isEditModal = false;
     this.showModal = true;

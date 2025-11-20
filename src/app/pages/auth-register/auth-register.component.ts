@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { US_STATES } from 'src/app/consts/us-states.const';
 import { Eligibility, MilitaryBranchAffiliation, UserRole, UserStatus } from 'src/app/enums/user.enum';
@@ -39,6 +39,7 @@ export class AuthRegisterComponent {
     private fb: FormBuilder,
     private auth: AuthService,
     private userService: UserService,
+    private route: ActivatedRoute,
     private router: Router,
     private toastr: ToastrService
   ) {}
@@ -71,6 +72,18 @@ export class AuthRegisterComponent {
       },
       { validators: [passwordsMatch] }
     );
+
+    this.route.queryParams.subscribe((params) => {
+      if (params['role']) {
+        if (params['role'] === 'photographer') {
+          this.userType = 'photographer';
+          this.form.get('role')?.setValue(UserRole.PHOTOGRAPHER);
+        } else if (params['role'] === 'client') {
+          this.userType = 'veteran';
+          this.form.get('role')?.setValue(UserRole.VETERAN);
+        }
+      }
+    });
 
     this.applyDynamicValidators();
   }
@@ -183,7 +196,7 @@ export class AuthRegisterComponent {
     this.submitting = true;
 
     const role = this.userType === 'photographer' ? UserRole.PHOTOGRAPHER : UserRole.VETERAN;
-    const status = this.userType === 'photographer' ? UserStatus.ONBOARDING : UserStatus.APPROVED;
+    const status = this.userType === 'photographer' ? UserStatus.PENDING : UserStatus.APPROVED;
 
     // map to backend DTO
     const payload: CreateUserDto = {
@@ -201,7 +214,8 @@ export class AuthRegisterComponent {
       postalCode: this.f['postalCode'].value || undefined,
       latitude: this.f['latitude'].value,
       longitude: this.f['longitude'].value,
-      referredBy: this.f['referredBy'].value || undefined
+      referredBy: this.f['referredBy'].value || undefined,
+      openToReferrals: true
     };
 
     if (role === UserRole.PHOTOGRAPHER) {
@@ -219,6 +233,12 @@ export class AuthRegisterComponent {
       .pipe(takeUntil(this.destroyed$))
       .subscribe({
         next: (user) => {
+          if (user.status === UserStatus.PENDING) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            this.toastr.success('Signed up successfully! Please wait until Admin reviews your information!');
+            this.router.navigate(['/login']);
+            this.auth.logout();
+          }
           if (user.status === UserStatus.ONBOARDING) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             this.toastr.success('Signed up successfully!');

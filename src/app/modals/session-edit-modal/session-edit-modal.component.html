@@ -3,7 +3,7 @@
   <button type="button" class="btn-close" (click)="cancelSession()" [disabled]="submitting"></button>
 </div>
 <div class="modal-body" [formGroup]="form">
-  <div class="form-group mb-3">
+  <!-- <div class="form-group mb-3">
     <label class="form-label" for="name">
       Session Name
       <span class="text-danger">*</span>
@@ -29,7 +29,7 @@
       placeholder="Session Note"
       [disabled]="isVeteran || submitting"
     ></textarea>
-  </div>
+  </div> -->
 
   <div class="form-group mb-3">
     <label class="form-label" for="status">
@@ -41,11 +41,10 @@
       class="form-control"
       formControlName="status"
       [ngClass]="{ 'is-invalid': isFormInvalid(form, 'status') }"
-      [disabled]="isVeteran || submitting"
+      [disabled]="true"
     >
-      <option [ngValue]="SessionStatus.SCHEDULED">Scheduled</option>
       <option [ngValue]="SessionStatus.COMPLETED">Completed</option>
-      <option [ngValue]="SessionStatus.CANCELED">Canceled</option>
+      <option [ngValue]="SessionStatus.INCOMPLETE">Incomplete</option>
     </select>
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'status')">Status is required.</div>
   </div>
@@ -112,7 +111,7 @@
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'photographerId')">Photographer is required.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isVeteran">
+  <div class="form-group mb-3" *ngIf="!isVeteran">
     <label class="form-label">
       Session Outcome
       <span class="text-danger">*</span>
@@ -124,7 +123,7 @@
         type="radio"
         [value]="SessionOutcome.PHOTOS_HAVE_BEEN_PROVIDED_TO_THE_PATRIOT"
         formControlName="outcomePhotographer"
-        [disabled]="isVeteran || submitting"
+        [disabled]="true"
       />
       <label class="form-check-label" for="phbp">Photos have been provided to the Patriot</label>
     </div>
@@ -135,7 +134,7 @@
         type="radio"
         [value]="SessionOutcome.PHOTOGRAPHER_HAS_NOT_PROVIDED_PHOTOS_YET"
         formControlName="outcomePhotographer"
-        [disabled]="isVeteran || submitting"
+        [disabled]="true"
       />
       <label class="form-check-label" for="phnp">Photographer has not provided photos yet</label>
     </div>
@@ -146,7 +145,7 @@
         type="radio"
         [value]="SessionOutcome.PATRIOT_DID_NOT_SHOW_UP_FOR_APPOINTMENT"
         formControlName="outcomePhotographer"
-        [disabled]="isVeteran || submitting"
+        [disabled]="true"
       />
       <label class="form-check-label" for="pdns">Patriot did not show up for appointment</label>
     </div>
@@ -157,7 +156,7 @@
         type="radio"
         [value]="SessionOutcome.NO_COMMUNICATION_UNABLE_TO_SCHEDULE"
         formControlName="outcomePhotographer"
-        [disabled]="isVeteran || submitting"
+        [disabled]="true"
       />
       <label class="form-check-label" for="ncut">No communication, unable to schedule</label>
     </div>
@@ -168,14 +167,22 @@
         type="radio"
         [value]="SessionOutcome.OTHER"
         formControlName="outcomePhotographer"
-        [disabled]="isVeteran || submitting"
+        [disabled]="true"
       />
       <label class="form-check-label" for="other">Other</label>
     </div>
+    <input
+      type="text"
+      *ngIf="form.get('outcomePhotographer').value === SessionOutcome.OTHER"
+      class="form-control mt-2"
+      placeholder="Please type another option here"
+      formControlName="otherOutcomePhotographer"
+      [disabled]="true"
+    />
     <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'outcomePhotographer')">Please select session outcome.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isVeteran">
+  <div class="form-group mb-3" *ngIf="!isVeteran">
     <label class="form-label">
       How would you rate this session?
       <span class="text-danger">*</span>
@@ -195,7 +202,7 @@
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'ratePhotographer')">Rate is required.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isVeteran">
+  <div class="form-group mb-3" *ngIf="!isVeteran">
     <label class="form-label" for="photographerFeedback">
       (Optional) Would you like to provide any additional comments about the session?
     </label>
@@ -234,7 +241,7 @@
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'veteranId')">Client is required.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isPhotographer">
+  <div class="form-group mb-3" *ngIf="!isPhotographer">
     <label class="form-label">
       Session Outcome
       <span class="text-danger">*</span>
@@ -294,10 +301,18 @@
       />
       <label class="form-check-label" for="other">Other</label>
     </div>
+    <input
+      type="text"
+      *ngIf="form.get('outcomeVeteran').value === SessionOutcome.OTHER"
+      class="form-control mt-2"
+      placeholder="Please type another option here"
+      formControlName="otherOutcomeVeteran"
+      [disabled]="true"
+    />
     <div class="invalid-feedback d-block" *ngIf="isFormInvalid(form, 'outcomeVeteran')">Please select session outcome.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isPhotographer">
+  <div class="form-group mb-3" *ngIf="!isPhotographer">
     <label class="form-label">
       How would you rate this session?
       <span class="text-danger">*</span>
@@ -317,7 +332,7 @@
     <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'rateVeteran')">Rate is required.</div>
   </div>
 
-  <div class="form-group mb-3" *ngIf="showFeedbackFields && !isPhotographer">
+  <div class="form-group mb-3" *ngIf="!isPhotographer">
     <label class="form-label" for="veteranFeedback">(Optional) Would you like to provide any additional comments about the session?</label>
     <textarea
       id="veteranFeedback"
@@ -328,9 +343,9 @@
     ></textarea>
   </div>
 </div>
-<div class="modal-footer">
+<!-- <div class="modal-footer">
   <button type="button" class="btn btn-primary" (click)="saveSession()" [disabled]="submitting">
     {{ submitting ? 'Saving...' : isEdit ? 'Update' : 'Create' }}
   </button>
   <button type="button" class="btn btn-secondary" (click)="cancelSession()" [disabled]="submitting">Cancel</button>
-</div>
+</div> -->

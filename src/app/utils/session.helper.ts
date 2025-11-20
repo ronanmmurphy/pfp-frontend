@@ -1,15 +1,13 @@
 import { SessionOutcome, SessionStatus } from '../enums/session.enum';
 
 export const SessionStatusBadgeClass: Record<SessionStatus, string> = {
-  [SessionStatus.SCHEDULED]: 'bg-success',
-  [SessionStatus.COMPLETED]: 'bg-warning',
-  [SessionStatus.CANCELED]: 'bg-danger'
+  [SessionStatus.COMPLETED]: 'bg-success',
+  [SessionStatus.INCOMPLETE]: 'bg-danger'
 };
 
 export const SessionStatusLabel: Record<SessionStatus, string> = {
-  [SessionStatus.SCHEDULED]: 'Scheduled',
   [SessionStatus.COMPLETED]: 'Completed',
-  [SessionStatus.CANCELED]: 'Canceled'
+  [SessionStatus.INCOMPLETE]: 'Incomplete'
 };
 
 export const SessionOutcomeLabel: Record<SessionOutcome, string> = {
