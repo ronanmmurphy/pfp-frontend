@@ -154,7 +154,7 @@
 
             <div class="form-group mb-3">
               <label class="form-label" for="streetAddress1">
-                Street Address
+                {{ userType === 'photographer' ? 'Studio' : '' }} Street Address
                 <span class="text-danger">*</span>
               </label>
               <input
@@ -166,11 +166,13 @@
                 [ngClass]="{ 'is-invalid': isFormInvalid(form, 'streetAddress1') }"
                 [disabled]="submitting"
               />
-              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'streetAddress1')">Street address is required.</div>
+              <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'streetAddress1')">
+                {{ userType === 'photographer' ? 'Studio' : '' }} Street address is required.
+              </div>
             </div>
 
             <div class="form-group mb-3">
-              <label class="form-label" for="streetAddress2">Street Address Line 2</label>
+              <label class="form-label" for="streetAddress2">{{ userType === 'photographer' ? 'Studio' : '' }} Street Address Line 2</label>
               <input
                 id="streetAddress2"
                 type="text"
@@ -338,6 +340,11 @@
                 [disabled]="submitting"
               />
               <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'website')">Portfolio link is required for photographers.</div>
+            </div>
+
+            <div class="form-group mb-3" *ngIf="userType === 'photographer'">
+              <label class="form-label" for="bookingLink">Booking Link</label>
+              <input id="bookingLink" type="text" class="form-control" formControlName="bookingLink" [disabled]="submitting" />
             </div>
 
             <!-- Veteran-Specific -->

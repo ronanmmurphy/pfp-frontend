@@ -87,6 +87,7 @@ export class UserEditModalComponent {
         // Photographer
         website: [null, []],
         openToReferrals: [true, Validators.required],
+        bookingLink: [null],
         // Photographer Onboarding
         mailingStreetAddress1: [null, []],
         mailingStreetAddress2: [null],
@@ -160,7 +161,6 @@ export class UserEditModalComponent {
         if (status === UserStatus.APPROVED && this.f['role'].value === UserRole.PHOTOGRAPHER) {
           setRequired(this.form, [
             'mailingStreetAddress1',
-            'closestBase',
             'agreeToCriminalBackgroundCheck',
             'socialMedia',
             'isHomeStudio',
@@ -255,7 +255,6 @@ export class UserEditModalComponent {
       if (status === UserStatus.APPROVED) {
         setRequired(this.form, [
           'mailingStreetAddress1',
-          'closestBase',
           'agreeToCriminalBackgroundCheck',
           'socialMedia',
           'isHomeStudio',

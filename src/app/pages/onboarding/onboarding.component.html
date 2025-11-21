@@ -85,20 +85,15 @@
 
               <div class="col-md-6">
                 <div class="form-group">
-                  <label class="form-label" for="closestBase">
-                    Closest Base
-                    <span class="text-danger">*</span>
-                  </label>
+                  <label class="form-label" for="closestBase">Closest Base</label>
                   <input
                     id="closestBase"
                     type="text"
                     class="form-control"
                     formControlName="closestBase"
                     placeholder="Closest Base"
-                    [ngClass]="{ 'is-invalid': isFormInvalid(form, 'closestBase') }"
                     [disabled]="submitting"
                   />
-                  <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'closestBase')">Closest Base is required.</div>
                 </div>
               </div>
             </div>

@@ -42,6 +42,7 @@ export interface CreateUserDto {
   // Photographer
   website?: string;
   openToReferrals: boolean;
+  bookingLink?: string;
   // Photographer Onboarding
   mailingStreetAddress1?: string;
   mailingStreetAddress2?: string;

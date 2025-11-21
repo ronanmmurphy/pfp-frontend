@@ -23,6 +23,7 @@ import { PasswordChangeModalComponent } from 'src/app/modals/password-change-mod
 export class ProfileComponent implements OnInit, OnDestroy {
   currentUser$!: Observable<IUser | null>;
   userId: number | null = null;
+  userRole: UserRole | null = null;
 
   userForm: FormGroup;
   passwordForm: FormGroup;
@@ -72,6 +73,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       // Photographer
       website: [null, []],
       openToReferrals: [true, Validators.required],
+      bookingLink: [null],
       // Photographer Onboarding
       mailingStreetAddress1: [null, []],
       mailingStreetAddress2: [null],
@@ -111,6 +113,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       tap((user) => {
         if (user) {
           this.userId = user.id;
+          this.userRole = user.role;
           this.userForm.patchValue({
             ...user,
             studioSpaceImages: [],
@@ -204,7 +207,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
       if (status === UserStatus.APPROVED) {
         setRequired(this.userForm, [
           'mailingStreetAddress1',
-          'closestBase',
           'agreeToCriminalBackgroundCheck',
           'socialMedia',
           'isHomeStudio',

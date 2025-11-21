@@ -20,6 +20,7 @@ export interface IUser {
   // Photographer
   website?: string | null;
   openToReferrals: boolean;
+  bookingLink?: string | null;
   // Photographer Onboarding
   mailingStreetAddress1?: string | null;
   mailingStreetAddress2?: string | null;

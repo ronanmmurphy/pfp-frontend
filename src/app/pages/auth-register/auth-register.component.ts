@@ -63,6 +63,7 @@ export class AuthRegisterComponent {
         latitude: [null, [Validators.required]],
         longitude: [null, [Validators.required]],
         website: [null, []],
+        bookingLink: [null],
         seekingEmployment: [null, []],
         linkedinProfile: [null],
         eligibility: [null, []],
@@ -220,6 +221,7 @@ export class AuthRegisterComponent {
 
     if (role === UserRole.PHOTOGRAPHER) {
       payload.website = this.f['website'].value;
+      payload.bookingLink = this.f['bookingLink']?.value;
     } else {
       payload.seekingEmployment = this.f['seekingEmployment'].value;
       payload.linkedinProfile = this.f['linkedinProfile'].value || undefined;

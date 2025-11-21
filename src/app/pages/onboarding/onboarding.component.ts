@@ -52,7 +52,7 @@ export class OnboardingComponent {
       mailingCity: [null],
       mailingState: [null],
       mailingPostalCode: [null],
-      closestBase: [null, [Validators.required]],
+      closestBase: [null],
       agreeToCriminalBackgroundCheck: [null, [Validators.required]],
       socialMedia: [null, [Validators.required]],
       isHomeStudio: [null, [Validators.required]],

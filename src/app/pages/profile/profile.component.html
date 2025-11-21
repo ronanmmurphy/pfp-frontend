@@ -84,7 +84,7 @@
 
         <div class="form-group mb-3">
           <label class="form-label" for="streetAddress1">
-            Street Address
+            {{ userRole === UserRole.PHOTOGRAPHER ? 'Studio' : '' }} Street Address
             <span class="text-danger">*</span>
           </label>
           <input
@@ -96,11 +96,15 @@
             [ngClass]="{ 'is-invalid': isFormInvalid(userForm, 'streetAddress1') }"
             [disabled]="submitting"
           />
-          <div class="invalid-feedback" *ngIf="isFormInvalid(userForm, 'streetAddress1')">Street address is required.</div>
+          <div class="invalid-feedback" *ngIf="isFormInvalid(userForm, 'streetAddress1')">
+            {{ userRole === UserRole.PHOTOGRAPHER ? 'Studio' : '' }} Street address is required.
+          </div>
         </div>
 
         <div class="form-group mb-3">
-          <label class="form-label" for="streetAddress2">Street Address Line 2</label>
+          <label class="form-label" for="streetAddress2">
+            {{ userRole === UserRole.PHOTOGRAPHER ? 'Studio' : '' }} Street Address Line 2
+          </label>
           <input
             id="streetAddress2"
             type="text"
@@ -282,6 +286,11 @@
             </div>
 
             <div class="form-group mb-3">
+              <label class="form-label" for="bookingLink">Booking Link</label>
+              <input id="bookingLink" type="text" class="form-control" formControlName="bookingLink" [disabled]="submitting" />
+            </div>
+
+            <div class="form-group mb-3">
               <label class="form-label" for="mailingStreetAddress1">
                 Mailing Street Address
                 <span class="text-danger">*</span>
@@ -354,20 +363,15 @@
 
               <div class="col-md-6">
                 <div class="form-group">
-                  <label class="form-label" for="closestBase">
-                    Closest Base
-                    <span class="text-danger">*</span>
-                  </label>
+                  <label class="form-label" for="closestBase">Closest Base</label>
                   <input
                     id="closestBase"
                     type="text"
                     class="form-control"
                     formControlName="closestBase"
                     placeholder="Closest Base"
-                    [ngClass]="{ 'is-invalid': isFormInvalid(userForm, 'closestBase') }"
                     [disabled]="submitting"
                   />
-                  <div class="invalid-feedback" *ngIf="isFormInvalid(userForm, 'closestBase')">Closest Base is required.</div>
                 </div>
               </div>
             </div>
