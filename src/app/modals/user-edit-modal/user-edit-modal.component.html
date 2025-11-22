@@ -180,7 +180,7 @@
 
         <div class="form-group mb-3">
           <label class="form-label" for="streetAddress1">
-            {{ user.role === UserRole.PHOTOGRAPHER ? 'Studio' : '' }} Street Address
+            {{ f['role'].value === UserRole.PHOTOGRAPHER ? 'Studio' : '' }} Street Address
             <span class="text-danger">*</span>
           </label>
           <input
@@ -193,13 +193,13 @@
             [disabled]="submitting"
           />
           <div class="invalid-feedback" *ngIf="isFormInvalid(form, 'streetAddress1')">
-            {{ user.role === UserRole.PHOTOGRAPHER ? 'Studio' : '' }} Street address is required.
+            {{ f['role'].value === UserRole.PHOTOGRAPHER ? 'Studio' : '' }} Street address is required.
           </div>
         </div>
 
         <div class="form-group mb-3">
           <label class="form-label" for="streetAddress2">
-            {{ user.role === UserRole.PHOTOGRAPHER ? 'Studio' : '' }} Street Address Line 2
+            {{ f['role'].value === UserRole.PHOTOGRAPHER ? 'Studio' : '' }} Street Address Line 2
           </label>
           <input
             id="streetAddress2"
